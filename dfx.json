@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "VaultVerse_backend": {
+      "main": "src/VaultVerse_backend/main.mo",
+      "type": "motoko"
+    },
+    "VaultVerse_frontend": {
+      "dependencies": [
+        "VaultVerse_backend"
+      ],
+      "source": [
+        "src/VaultVerse_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "VaultVerse_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
