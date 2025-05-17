@@ -1,18 +1,23 @@
 {
   "canisters": {
-    "VaultVerse_backend": {
-      "main": "src/VaultVerse_backend/main.mo",
+    "core_protocol_canister": {
+      "main": "src/core_protocol_canister/main.mo",
       "type": "motoko"
     },
-    "VaultVerse_frontend": {
+    "auction_governance_canister": {
+      "main": "src/auction_governance_canister/main.mo",
+      "type": "motoko"
+    },
+    "frontend": {
       "dependencies": [
-        "VaultVerse_backend"
+        "core_protocol_canister",
+        "auction_governance_canister"
       ],
       "source": [
-        "src/VaultVerse_frontend/dist"
+        "src/frontend/dist"
       ],
       "type": "assets",
-      "workspace": "VaultVerse_frontend"
+      "workspace": "frontend"
     }
   },
   "defaults": {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { VaultVerse_backend } from 'declarations/VaultVerse_backend';
+import { core_protocol_canister } from 'declarations/core_protocol_canister';
+import { auction_governance_canister } from 'declarations/auction_governance_canister';
 
 function App() {
   const [greeting, setGreeting] = useState('');
@@ -7,7 +8,7 @@ function App() {
   function handleSubmit(event) {
     event.preventDefault();
     const name = event.target.elements.name.value;
-    VaultVerse_backend.greet(name).then((greeting) => {
+    core_protocol_canister.greet(name).then((greeting) => {
       setGreeting(greeting);
     });
     return false;
