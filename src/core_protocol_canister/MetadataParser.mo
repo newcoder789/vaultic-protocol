@@ -1,5 +1,8 @@
 import Http "mo:ic:Http";
 import Blob "mo:base/Blob";
+import IC "mo:ic";
+import Text "mo:base/Text";
+import Cycles "mo:base/ExperimentalCycles";
 
 public func http_get(url: Text) : async Text {
     let request : Http.Request = {
@@ -69,6 +72,30 @@ actor {
     }
     
     };
+    
+    public func get_metadata() : async Text {
+    let url = "https://entrepot.app/api/token/azle_heroes/1";
+    let request_headers = [
+        { name = "accept"; value = "application/json" }
+    ];
+    
+    let http_request : IC.http_request_args = {
+        url = url;
+        max_response_bytes = null;
+        headers = request_headers;
+        body = null;
+        method = #get;
+        transform = null;
+    };
 
+    Cycles.add<system>(230_000_000_000);
+
+    let http_response = await IC.http_request(http_request);
+    let response_text = switch (Text.decodeUtf8(http_response.body)) {
+        case null "No metadata returned";
+        case (?txt) txt;
+    };
+    response_text
+    };
 
 }
