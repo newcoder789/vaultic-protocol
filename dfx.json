@@ -20,6 +20,12 @@
       "workspace": "frontend"
     }
   },
+  "packages": {
+    "ic": {
+      "type": "local",
+      "path": "src/lib/ic"
+    }
+  },
   "defaults": {
     "build": {
       "args": "",
