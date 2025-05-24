@@ -1,0 +1,68 @@
+.slider {
+  width: 100%;
+  height: var(--height);
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 10% 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10% 90%, transparent);
+  position: relative;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.slider .list {
+  display: flex;
+  width: 100%;
+  min-width: calc(var(--width) * var(--quantity));
+  position: relative;
+  pointer-events: none;
+}
+
+.slider .list .item {
+  width: var(--width);
+  height: var(--height);
+  position: absolute;
+  left: calc(var(--width) * var(--quantity));
+  animation: autoRun 20s linear infinite;
+  animation-delay: calc((20s / var(--quantity)) * var(--position));
+  transition: filter 0.5s, transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.slider:hover .list .item {
+  animation-play-state: paused !important;
+}
+
+.slider .list .item.not-hovered {
+  filter: grayscale(1);
+}
+
+.slider .list .item.hovered {
+  filter: grayscale(0);
+  transform: scale(1.2) translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.slider[reverse="true"] .list .item {
+  animation: reversePlay 20s linear infinite;
+  animation-delay: calc((20s / var(--quantity)) * var(--position));
+}
+
+@keyframes autoRun {
+  from {
+    left: calc(var(--width) * var(--quantity));
+  }
+  to {
+    left: calc(var(--width) * -1);
+  }
+}
+
+@keyframes reversePlay {
+  from {
+    left: calc(var(--width) * -1);
+  }
+  to {
+    left: calc(var(--width) * var(--quantity));
+  }
+}
