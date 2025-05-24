@@ -16,6 +16,14 @@
     "src/frontend"
   ],
   "dependencies": {
+    "@dfinity/agent": "^2.4.1",
+    "@dfinity/auth-client": "^2.4.1",
+    "@dfinity/candid": "^2.4.1",
+    "@dfinity/identity": "^2.4.1",
+    "@dfinity/ledger-icp": "^2.6.13",
+    "@dfinity/principal": "^2.4.1",
+    "@dfinity/utils": "^2.13.0",
+    "@nfid/identitykit": "^1.0.13",
     "react-router-dom": "^7.6.0"
   }
 }
