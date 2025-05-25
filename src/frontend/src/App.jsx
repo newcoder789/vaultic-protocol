@@ -6,6 +6,8 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { useEffect } from "react";
 import CollectionSlider from './components/CollectionSlider';
+import HomeWrapper from "./components/HomeWrapper";
+import HowItWorks from "./components/HowItWorks";
 
 export default function App() {
   useEffect(() => {
@@ -60,6 +62,10 @@ export default function App() {
           className="mt-8"
         />
       </section>
+      <HomeWrapper/>
+      
+      <HowItWorks/>
+        
       <CollectionSlider/>
     </main>
   );
