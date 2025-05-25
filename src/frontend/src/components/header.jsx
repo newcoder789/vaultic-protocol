@@ -2,7 +2,18 @@ import 'boxicons/css/boxicons.min.css'
 import { useState } from 'react';
 
 import { IdentityKitProvider, ConnectWallet } from "@nfid/identitykit/react";
-import "@nfid/identitykit/react/styles.css";
+// import "@nfid/identitykit/react/styles.css"
+import { IdentityKitAuthType } from "@nfid/identitykit";
+// import { useIdentity } from "@nfid/identitykit";
+
+
+// import canisterIds from '../../../../.dfx/local/canisters';
+
+import {
+    ConnectWalletButton,
+    ConnectedWalletButton,
+    ConnectWalletDropdownMenu,
+} from "@nfid/identitykit/react"
 
 
 const Header = () => {
@@ -12,23 +23,20 @@ const Header = () => {
         const menu = document.getElementById("MobileMenu");
         menu.classList.toggle("hidden");
     };
-      
-    const connect = async ()=>{
-        if (window.ic && window.ic.plug) {
-            await window.ic.plug.requestConnect();
-            setIsConnected(true);
-            const principal = await window.ic.plug.getPrincipal();
-            console.log(`Connected principal: ${principal.toText()}`);
-            alert(`Connected principal: ${principal.toText()}`);
+    console.log("Header rendered");
 
-        } else {
-            console.error("Plug Wallet not installed");
-        }
-    }
+    // const { identity, isAuthenticated } = useIdentity();
+
+    // Manual connect handler for testing
+    const handleManualConnect = () => {
+        console.log("Manual connect button clicked");
+        // Add any manual connect logic here if possible
+        alert("Manual connect button clicked - implement connection logic");
+    };
+
   return (
+      <header className="relative z-20 flex justify-between items-center py-4 px-4 lg:px-20">
 
-      <IdentityKitProvider>
-        <header className="flex justify-between items-center py-4 px-4 lg:px-20">
             <h1 data-aos="fade-down"
         data-aos-easing="linear"
         data-aos-duration="1500" className="text-2xl md:text-4xl lg:text-3xl font-light m-0">
@@ -57,10 +65,14 @@ const Header = () => {
                 data-aos-duration="2500" className="text-base tracking-wider transition-colors hover:text-gray-300 x-50 " href="#">
                     DOCS
                 </a>
-            </nav>
+            </nav>  
                 {/* CONNECT WALLET */}
-                <ConnectWallet />
-            {/*mobile menu */}
+                <ConnectWallet
+                    className = "cursor-pointer"
+                    onConnect={() => console.log("Wallet connected")}
+                    onDisconnect={() => console.log("Wallet disconnected")}
+                    onError={(error) => console.error("ConnectWallet error:", error)}
+                />
         <button onClick={toggleMobileMenu} className='md:hidden text-3xl p-2 z-50'>
                 <i className='bx bx-menu text-black'></i>
             </button>
@@ -83,7 +95,6 @@ const Header = () => {
             </div>
 
         </header>
-    </IdentityKitProvider>
   )
 }
 
