@@ -1,3 +1,4 @@
+
 import Header from "./components/header";
 import Hero from "./components/Hero";
 import ImageSlider from "./components/ImageSlider";
@@ -8,6 +9,12 @@ import { useEffect } from "react";
 import CollectionSlider from './components/CollectionSlider';
 import HomeWrapper from "./components/HomeWrapper";
 import HowItWorks from "./components/HowItWorks";
+import Features from "./components/Features";
+import Testimonials from "./components/Testimonials";
+import ProtocolStats from "./components/ProtocolStats";
+import GovernanceTokenomics from "./components/GovernanceTokenomics";
+import CallToAction from "./components/CallToAction";
+import Footer from "./components/Footer";
 
 export default function App() {
   useEffect(() => {
@@ -44,7 +51,7 @@ export default function App() {
         <h2
           className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6"
           style={{
-          color: '#6464dc',
+          color: ' #FFFFFF',
           }}
           data-aos="fade-up"
           data-aos-duration="1500"
@@ -65,8 +72,15 @@ export default function App() {
       <HomeWrapper/>
       
       <HowItWorks/>
-        
+      <Features/>
+      <Testimonials/>
+      
+      <ProtocolStats/>
+      <GovernanceTokenomics/>
       <CollectionSlider/>
+
+      <CallToAction/>
+      <Footer/>
     </main>
   );
 }
