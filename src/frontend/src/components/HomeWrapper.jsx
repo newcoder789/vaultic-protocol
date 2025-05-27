@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 const HomeWrapper = () => {
-  // Define the positions for the images
   const positions = [
-    { name: 'left', style: 'top-0 left-[-50px] rotate-[-10deg] z-10' }, // Left position
-    { name: 'top', style: 'top-0 left-[80px] z-20' }, // Top (middle) position
-    { name: 'right', style: 'top-0 left-[210px] rotate-[10deg] z-10' }, // Right position
+    { top: 0, left: -50, rotate: -10, zIndex: 10 },
+    { top: 0, left: 80, rotate: 0, zIndex: 20 },
+    { top: 0, left: 210, rotate: 10, zIndex: 10 },
   ];
 
-  // State to track the current position index for each image
   const [imagePositions, setImagePositions] = useState([
-    { id: 'left-img', posIndex: 0 }, // Initially in 'left' position
-    { id: 'top-img', posIndex: 1 },  // Initially in 'top' position
-    { id: 'right-img', posIndex: 2 }, // Initially in 'right' position
+    { id: "left-img", posIndex: 0 },
+    { id: "top-img", posIndex: 1 },
+    { id: "right-img", posIndex: 2 },
   ]);
 
-  // Handle click to swap positions
   const handleImageClick = () => {
-    setImagePositions((prevPositions) =>
-      prevPositions.map((img) => ({
+    setImagePositions((prev) =>
+      prev.map((img) => ({
         ...img,
-        posIndex: (img.posIndex + 1) % 3, // Cycle through positions: 0 -> 1 -> 2 -> 0
+        posIndex: (img.posIndex + 1) % 3,
       }))
     );
   };
@@ -29,7 +27,13 @@ const HomeWrapper = () => {
     <div className="w-full min-h-screen bg-gradient-to-r from-black via-[#1a0a2a] to-black flex items-center justify-center px-6">
       <div className="max-w-6xl w-full flex flex-col md:flex-row items-center justify-between">
         {/* Text section */}
-        <div className="text-white space-y-4 mb-10 md:mb-0">
+        <motion.div
+          className="text-white space-y-4 mb-10 md:mb-0 w-full md:w-1/2"
+          initial={{ x: -150, opacity: 0 }}
+          whileInView={{ x: 0, opacity: 1 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.7 }}
+        >
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             Decentralized NFT Lending
           </h1>
@@ -39,28 +43,42 @@ const HomeWrapper = () => {
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             That People <span className="text-purple-500">Love</span>.
           </h1>
-        </div>
+        </motion.div>
 
-        {/* NFT image wrapper */}
-        <div className="relative w-[520px] h-[280px]">
-          {imagePositions.map((img, index) => (
-            <div
-              key={img.id}
-              className={`absolute w-[320px] h-[280px] rounded-xl shadow-xl border border-green-400 overflow-hidden bg-black cursor-pointer transition-all duration-500 ease-in-out ${
-                positions[img.posIndex].style
-              }`}
-              onClick={handleImageClick}
-            >
-              <img
-                src={`/public/img/Nfts/${
-                  index === 0 ? '1.webp' : index === 1 ? '3.png' : '2.webp'
-                }`}
-                alt={`NFT ${positions[img.posIndex].name}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
+        {/* Image section */}
+        <motion.div
+          className="relative w-[520px] h-[280px]"
+          initial={{ x: 150, opacity: 0 }}
+          whileInView={{ x: 0, opacity: 1 }}
+          transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
+          viewport={{ once: true, amount: 0.7 }}
+        >
+          {imagePositions.map((img, index) => {
+            const pos = positions[img.posIndex];
+            return (
+              <motion.div
+                key={img.id}
+                onClick={handleImageClick}
+                className="absolute w-[320px] h-[280px] rounded-xl shadow-xl border border-green-400 overflow-hidden bg-black cursor-pointer"
+                animate={{
+                  top: pos.top,
+                  left: pos.left,
+                  rotate: pos.rotate,
+                  zIndex: pos.zIndex,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                <img
+                  src={`/img/Nfts/${
+                    index === 0 ? "1.webp" : index === 1 ? "3.png" : "2.webp"
+                  }`}
+                  alt={`NFT ${img.id}`}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </div>
     </div>
   );
