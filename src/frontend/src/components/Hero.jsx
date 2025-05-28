@@ -17,16 +17,19 @@ const Hero = () => {
         </div>
       
       {/*main heading */}
-      <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider my-8'>
-        VAULTIC PROTOCOL
+    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight my-8 text-white">
+  <span className="whitespace-nowrap">VAULTIC PROTOCOL</span>{' '}
+  <span>
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-purple-700">Smart</span>{' '}
+    Loans for{' '}
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-purple-700">Web3</span>
+  </span>
+</h1>
 
-      <br/>
-      Smart Loans for Web3
-       </h1>
-      <p className='text-base sm:text-lg tracking-wider text-gray-400 max-w-[25rem] lg:max-w-[30rem]'>
-      Borrow and lend securely on-chain, with no middleman.
-      Built on Internet Computer using Motoko.
-      </p>
+<p className="text-lg sm:text-xl tracking-wide text-gray-400 max-w-[28rem] mt-4">
+  Borrow and lend securely on-chain, with no middleman.<br />
+  Built on Internet Computer using <span className="text-white font-semibold">Motoko</span>.
+</p>
       {/* Buttons */}
         <div className='flex justify-center lg:justify-start gap-4 mt-5'>
           {/* LOAN Button (Outline style) */}
@@ -62,7 +65,9 @@ const Hero = () => {
       <Spline data-aos="fade-zoom-in"
         data-aos-easing="ease-in-back"
         data-aos-delay="300"
-        data-aos-offset="0" data-aos-duration="3000" className='absolute lg:top-0 top-[-20%] bottom-0 lg:left-[20%] sm:left-[-2%]' /*scene="https://prod.spline.design/8qjNcB0Abb5PbyP8/scene.splinecode"*/scene="https://prod.spline.design/Nq4APvw3G46E0Ufa/scene.splinecode" />
+        data-aos-offset="0" data-aos-duration="3000"
+        style={{ transform: 'scale(1.5)' }} 
+         className='absolute lg:top-0 top-[-20%] bottom-0 lg:left-[20%] sm:left-[-2%]' /*scene="https://prod.spline.design/8qjNcB0Abb5PbyP8/scene.splinecode"*/scene="https://prod.spline.design/Nq4APvw3G46E0Ufa/scene.splinecode" />
         
     </main>
   );
