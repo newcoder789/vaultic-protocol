@@ -1,20 +1,51 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect, useState } from "react"
 import { useAgent } from "@nfid/identitykit/react"
-import { Actor } from "@dfinity/agent"
+import { HttpAgent, Actor } from "@dfinity/agent";
 
 
 import { idlFactory as targetIdlFactory } from "../../../declarations/core_protocol_canister/core_protocol_canister.did.js";
+import { useAuth } from "@nfid/identitykit/react"
 
-const TARGET_CANISTER_ID = "u6s2n-gx777-77774-qaaba-cai";
+const LOCAL_ICP_HOST = "http://127.0.0.1:8080"; // LOCALHOST (DFX)
+
+const TARGET_CANISTER_ID = 'u6s2n-gx777-77774-qaaba-cai';
 
 export function AuthenticatedSection() {
     const authenticatedAgent = useAgent();
+
+    const { connect, disconnect, isConnecting, user } = useAuth()
+    const [unauthenticatedAgent, setUnauthenticatedAgent] = useState ();
+    // Set up unauthenticated agent for local replica
+    useEffect(() => {
+        const agent = new HttpAgent({ host: LOCAL_ICP_HOST });
+
+        // Optional: trust local certificate (development only!)
+        agent.fetchRootKey().catch((err) => {
+            console.warn("Unable to fetch root key. Check if local replica is running.");
+            console.error(err);
+        });
+
+        setUnauthenticatedAgent(agent);
+    }, []);
+
+    const createActor = useMemo(() => {
+
+        if(!unauthenticatedAgent) {
+            console.log("Agent not initialized. Connect your wallet first.");
+            return null;
+        }
+
+        return Actor.createActor(targetIdlFactory, {
+            agent: unauthenticatedAgent,
+            canisterId: TARGET_CANISTER_ID,
+          });
+    }, [unauthenticatedAgent]);
 
     const authenticatedActor = useMemo(() => {
         if (!authenticatedAgent) return null;
 
         return Actor.createActor(targetIdlFactory, {
-            agent: "u6s2n-gx777-77774-qaaba-cai",
+            agent: authenticatedAgent,
             canisterId: TARGET_CANISTER_ID,
         });
     }, [authenticatedAgent]);
@@ -22,20 +53,22 @@ export function AuthenticatedSection() {
 
     const tryingActor = async () => {
         console.log("Trying to call actor methods...");
-        if (!authenticatedActor) {
-            alert("Actor not initialized. Connect your wallet first.");
+        if (!createActor) {
+            console.log("Actor not initialized. Connect your wallet first.");
             return;
         }
 
         try {
-            const result1 = await authenticatedActor.greet("Aryan");
-            console.log("Result of greet:", result1);
 
+            console.log(createActor)
+            const result1 = await createActor.greet("Aryan");
+            console.log("Result of greet:", result1);
             // const result2 = await authenticatedActor.icrc28_trusted_origins({
             //     origin: "https://example.com",
             //     canisterId: "u6s2n-gx777-77774-qaaba-cai",
             // });
             // console.log("Result of icrc28_trusted_origins:", result2);
+            
         } catch (err) {
             console.error("Actor call failed:", err);
         }

@@ -11,4 +11,22 @@ module {
     headers : [(Text, Text)];
     body : Blob;
   };
+  public type NFT = {
+      canisterId: Principal;
+      tokenId: Text;
+      standard: { #DIP721; #EXT };
+  };
+
+  public type Attribute = {
+      trait_type: Text;
+      value: Text;
+  };
+  public type NFTMetadata = {
+        name: Text;
+        description: Text;
+        image: Text;
+        attributes: [Attribute];
+        collection: ?Text;
+    };
+
 }

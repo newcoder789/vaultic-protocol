@@ -1,49 +1,66 @@
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
-import Debug "mo:base/Debug";
+import Result "mo:base/Result";
+import Types "types";
+import DIP721 "dip721_interface";
+import Generic "Generic";
 
-actor {
+// actor NFTLocker {
+    // Using your defined types
+    type TokenMetadata = DIP721.TokenMetadata;
+    type Property = Generic.Property;
+    type NFT = Types.NFT;
+    type Result<T, E> = Result.Result<T, E>;
 
-  type TokenId = Nat;
-  type LockInfo = {
-    original_owner: Principal;
-    locked_at: Int;
-  };
+    // Storage for locked NFTs: (user principal → NFT list)
+    private var lockedNFTs = HashMap.HashMap<Principal, [NFT]>(10, Principal.equal, Principal.hash);
 
-  stable var lockedNFTs = HashMap.HashMap<TokenId, LockInfo>(0, HashMap.natHash);
+    // Lock DIP721 NFT
+//     public shared(msg) func lock_dip721(
+//         nftCanister: Principal,
+//         tokenId: Nat
+//     ) : async Result<(), Text> {
+//         // Create actor reference using your interface
+//         let dip721 : DIP721.BasicInterface = actor(Principal.toText(nftCanister));
+        
+//         // Verify ownership
+//         switch (await dip721.ownerOf(tokenId)) {
+//             case (#Ok(owner)) {
+//                 if (owner != msg.caller) {
+//                     return #err("Caller is not the owner");
+//                 };
+//             };
+//             case (#Err(e)) { return #err("Ownership check failed") };
+//         };
 
-  // Simulate locking the NFT (after transfer)
-  public func lockNFT(tokenId: TokenId, owner: Principal) : async Text {
-    if (lockedNFTs.contains(tokenId)) {
-      return "Token already locked";
-    };
+//         // Transfer NFT to locker
+//         switch (await dip721.transferFrom(msg.caller, Principal.fromActor(NFTLocker), tokenId)) {
+//             case (#Ok(_)) {
+//                 // Add to vault
+//                 let nft : NFT = {
+//                     canisterId = nftCanister;
+//                     tokenId = Nat.toText(tokenId);
+//                     standard = #DIP721;
+//                 };
+//                 _addToVault(msg.caller, nft);
+//                 #ok()
+//             };
+//             case (#Err(e)) { #err("Transfer failed") };
+//         };
+//     };
 
-    // Record the lock
-    let now = Time.now();
-    lockedNFTs.put(tokenId, {
-      original_owner = owner;
-      locked_at = now;
-    });
+//     // Internal helper
+//     private func _addToVault(user: Principal, nft: NFT) {
+//         let current = switch (lockedNFTs.get(user)) {
+//             case (?nfts) nfts;
+//             case null [];
+//         };
+//         lockedNFTs.put(user, Array.append(current, [nft]));
+//     };
 
-    return "NFT locked successfully";
-  };
-
-  // Check if a token is locked
-  public query func isLocked(tokenId: TokenId) : async Bool {
-    lockedNFTs.contains(tokenId);
-  };
-
-  // Unlock NFT (could be called after loan repayment)
-  public func unlockNFT(tokenId: TokenId, requester: Principal) : async Text {
-    switch (lockedNFTs.get(tokenId)) {
-      case (null) return "NFT not locked";
-      case (?lockInfo) {
-        if (lockInfo.original_owner != requester) {
-          return "Unauthorized unlock attempt";
-        };
-        lockedNFTs.delete(tokenId);
-        return "NFT unlocked and ready to return";
-      };
-    };
-  };
-}
+//     // Release NFT (only callable by LoanManager)
+//     public shared(msg) func releaseNFT(user: Principal, nft: NFT) : async () {
+//         assert(msg.caller == Principal.fromText("loan-manager-principal"));
+//         // Transfer back to user logic
+//     };
+// // }

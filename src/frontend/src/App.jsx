@@ -1,3 +1,6 @@
+
+// Set this before rendering the component
+InternetIdentity.providerUrl = "http://localhost:8080/?canisterId=umunu-kh777-77774-qaaca-cai"; 
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header";
@@ -24,7 +27,7 @@ export default function App() {
       once: true,
     });
   }, []);
-
+  
   // const ICP_API_HOST
 
   return (
@@ -33,9 +36,12 @@ export default function App() {
       signerClientOptions={{
         targets: ["core_protocol_canister", "auction_governance_canister"], 
       }}
-      signers={[NFIDW, InternetIdentity, Stoic, OISY]}
+      signers={[
+        InternetIdentity,
+        NFIDW,  Stoic, OISY]}
       featuredSigner={NFIDW}
       theme={IdentityKitTheme.DARK} 
+      agentOptions={{ host: "http://127.0.0.1:8080" }} 
       >
       <main className="relative z-10">
 
@@ -51,8 +57,8 @@ export default function App() {
 
         {/* ACTUAL CONTENT */}
         <Header />
-        <AuthenticatedSection />
         <Hero />
+        <AuthenticatedSection />
       </main>
     </IdentityKitProvider>
   )

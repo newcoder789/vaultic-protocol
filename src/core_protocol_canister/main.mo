@@ -1,13 +1,30 @@
 import Blob "mo:base/Blob";
 import IC "ic:aaaaa-aa";
 import Text "mo:base/Text";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
+import Cycles "mo:base/ExperimentalCycles";
+import DIP721 "./dip721_interface";
 
 
 actor {
+  
+  // let externalNFT = actor("aaaaa-aa") : DIP721.DIP721Interface;
   public query func greet(name : Text) : async Text {
     return "Hello, " # name # "!";
   };
+
+  // public query func checkNFT(nftCanister: Principal, tokenId: Nat) : async Text {
+  //   let nft = actor(nftCanister) : DIP721.DIP721Interface;
+    // let result = await nft.ownerOf(tokenId);
+
+  //   switch result {
+  //       case (#Ok(owner)) {
+  //           return "Owner is " # Principal.toText(owner);
+  //       };
+  //       case (#Err(err)) {
+  //           return "Error: " # debug_show(err);
+  //       };
+  //   };
+  // };
 
   // transform function to convert the response body to a string and ignore the headers
   public shared query func transform({
@@ -38,10 +55,14 @@ actor {
             };
         };
         
-        ExperimentalCycles.add(230_949_972_000); 
-        
-        let http_response : IC.http_request_result = await IC.http_request(http_request);
-        
+        // Cycles.add(230_949_972_000);
+        Cycles.add<system>(230_949_972_000);
+        // (with cycles = 230_949_972_000) C.send(...)
+
+        // let http_response : IC.http_request_result = await IC.http_request(http_request);
+      
+
+        let http_response : IC.http_request_result = await (with cycles = 230_949_972_000) IC.http_request(http_request);
         let decoded_text : Text = switch (Text.decodeUtf8(http_response.body)) {
             case (null) { "No value returned" };
             case (?y) { y };
@@ -50,6 +71,24 @@ actor {
     };
 
     
+
+  public shared func getDip721Metadata(
+        canisterId: Principal,
+        tokenId: Nat
+    ) : async Metadata.NFTMetadata {
+        let dip721 : DIP721.BasicInterface = actor(Principal.toText(canisterId));
+        let metadata = await dip721.tokenMetadata(tokenId);
+        Metadata.extractDIP721Metadata(metadata)
+    };
+
+
+
+
+
+
+
+
+
   // for identity kit
   type SupportedStandard = {
     url : Text;
@@ -77,6 +116,11 @@ actor {
     let trustedOrigins : [Text] = [
       // LOCAL (development)
       "http://localhost:3000", // or 3000/your local port
+       "http://127.0.0.1:3000", 
+       "http://localhost:8000", // or 8000/your local port
+      "http://127.0.0.1:8000",
+    
+
       "https://uzt4z-lp777-77774-qaabq-cai.icp0.io",
       "https://uzt4z-lp777-77774-qaabq-cai.raw.icp0.io",
       "https://uzt4z-lp777-77774-qaabq-cai.ic0.app",

@@ -1,86 +1,50 @@
-import Blob "mo:base/Blob";
-import IC "ic:aaaaa-aa";
-import Text "mo:base/Text";
-import Cycles "mo:base/ExperimentalCycles";
-
-
+// src/core_protocol_canister/metadata.mo
 module {
-    type NormalizedMetadata = {
-        token_id: Nat;
-        name: Text;
-        image: Text;
-        attributes: [Attribute];
-    };
+    import DIP721 "dip721_interface";
+    import Types "types";
+    import Array "mo:base/Array";
 
-    type Attribute = {
-        trait_type: Text;
-        value: Text;
-    };
+    public type Attribute = Types.Attribute;
+    public type NFTMetadata = Types.NFTMetadata;
+    public type TokenMetadata = DIP721.TokenMetadata;
 
-    // public func normalize_metadata(canisterId: Principal, tokenId: Nat) : async ?NormalizedMetadata {
-    //     let metadataResult = await canisterId.getMetadata(tokenId);
+    public func extractDIP721Metadata(
+        metadata: TokenMetadata
+    ) : NFTMetadata {
+        // Convert properties to attributes
+        let attributes = Array.map<DIP721.Generic.Property, Attribute>(
+            metadata.properties,
+            func(prop) = { 
+                trait_type = prop.name; 
+                value = prop.value 
+            }
+        );
         
-    //     let metadataJson : Text = switch (metadataResult) {
-    //         case (#Uri(uri)) {
-    //             await http_get(uri);
-    //         };
-    //         case (#Json(jsonText)) jsonText;
-    //         case _ return null;
-    //     };
-
-    //     let parsed = JSON.parse(metadataJson);
-    //     switch (parsed) {
-    //         case (?obj) {
-    //             let token_id = tokenId;
-    //             let name = switch (obj.get("name")) { case (?n) n; case _ ""; };
-    //             let image = switch (obj.get("image")) { case (?i) i; case _ ""; };
-    //             let attributes = switch (obj.get("attributes")) {
-    //                 case (?arr) {
-    //                     arr
-    //                     |> Array.map<JSON, Attribute>(func (attr) {
-    //                         {
-    //                             trait_type = switch (attr.get("trait_type")) { case (?t) t; case _ ""; };
-    //                             value = switch (attr.get("value")) { case (?v) v; case _ ""; };
-    //                         }
-    //                     });
-    //                 };
-    //                 case _ [];
-    //             };
-                // --remove this text--?{
-    //                 token_id = token_id;
-    //                 name = name;
-    //                 image = image;
-    //                 attributes = attributes;
-    //             }
-    //         };
-    //         case _ null;
-    //     }
-    
-    // };
-    
-    public func get_metadata() : async Text {
-    let url = "https://entrepot.app/api/token/azle_heroes/1";
-    let request_headers = [
-        { name = "accept"; value = "application/json" }
-    ];
-    
-    let http_request : IC.http_request_args = {
-        url = url;
-        max_response_bytes = null;
-        headers = request_headers;
-        body = null;
-        method = #get;
-        transform = null;
+        // Extract standard fields
+        var name = "";
+        var description = "";
+        var image = "";
+        
+        for (prop in metadata.properties.vals()) {
+            switch (prop.name) {
+                case "name" { name := prop.value };
+                case "description" { description := prop.value };
+                case "image" { image := prop.value };
+                case _ {};
+            };
+        };
+        
+        {
+            name;
+            description;
+            image;
+            attributes;
+            collection = null;
+        }
     };
 
-    Cycles.add<system>(230_000_000_000);
-
-    let http_response = await IC.http_request(http_request);
-    let response_text = switch (Text.decodeUtf8(http_response.body)) {
-        case null "No metadata returned";
-        case (?txt) txt;
+    public func parseHttpResponse(body: Blob) : ?NFTMetadata {
+        // Implement your HTTP response parsing here
+        null // Placeholder
     };
-    return response_text;
-    };
-
 }

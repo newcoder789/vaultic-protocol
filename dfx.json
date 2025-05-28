@@ -1,5 +1,11 @@
 {
   "canisters": {
+    "internet_identity": {
+      "type": "custom",
+      "candid": "internet_identity/internet_identity.did",
+      "wasm": "internet_identity/internet_identity_dev.wasm.gz",
+      "build": ""
+    },
     "core_protocol_canister": {
       "main": "src/core_protocol_canister/main.mo",
       "type": "motoko"
