@@ -14,6 +14,10 @@
       "main": "src/auction_governance_canister/main.mo",
       "type": "motoko"
     },
+    "dip721_nft_container": {
+      "type": "motoko",
+      "main": "src/dip721_nft/main.mo"
+    },
     "frontend": {
       "dependencies": [
         "core_protocol_canister",

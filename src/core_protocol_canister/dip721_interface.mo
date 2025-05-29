@@ -183,6 +183,7 @@ module {
         #ExistedNFT;
         #OwnerNotFound;
         #Other : Text;
+        #Unknown;
     };
 
     public class BasicNFT(
