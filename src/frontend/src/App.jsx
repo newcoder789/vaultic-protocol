@@ -14,6 +14,7 @@ import { AuthenticatedSection } from "./helpers/agent";
 import { useAuth } from "@nfid/identitykit/react"
 
 import NFTMetadataFetcher from "./components/NFTMetadataFetcher";
+import NFTMinter from "./components/NFTMinter";
   export default function App() {
     
     const { connect, disconnect, isConnecting, user } = useAuth()
@@ -71,7 +72,7 @@ import NFTMetadataFetcher from "./components/NFTMetadataFetcher";
           <p>Connect your wallet to view NFTs.</p>
         )}
       </section>
-
+      <NFTMinter userPrincipal={userPrincipal} />
       </main>
   )
 }

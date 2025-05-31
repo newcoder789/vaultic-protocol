@@ -12,6 +12,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Nat32 "mo:base/Nat32";
 import Int "mo:base/Int";
+
 import Generic "./Generic";
 
 actor class NFTLendingCanister(
@@ -617,12 +618,23 @@ actor class NFTLendingCanister(
 
     // --- MintInterface Implementation ---
 
-    public shared ({ caller }) func mint(to : Principal, tokenId : Nat, properties : [Generic.Property]) : async Result<Nat> {
+    private var nextTokenId : Nat = 1;
+
+    public shared ({ caller }) func mint(to : Principal, properties : [Generic.Property]) : async    Result<Nat> {
         if (not isCustodian(caller)) {
             return #Err(#Unauthorized);
         };
+
+        // Validate properties
+        let hasName = Array.find<Generic.Property>(properties, func(p) { p.key == "name" }) != null;
+        let hasImage = Array.find<Generic.Property>(properties, func(p) { p.key == "image" }) != null;
+        if (not hasName or not hasImage) {
+            return #Err(#Other("Name and image are required"));
+        };
+
+        let tokenId = nextTokenId;
         switch (tokens.get(tokenId)) {
-            case (?_) { #Err(#ExistedNFT) };
+            case (?_) { return #Err(#ExistedNFT) };
             case null {
                 let token : TokenMetadata = {
                     transferred_at = null;
@@ -632,8 +644,8 @@ actor class NFTLendingCanister(
                     properties = properties;
                     is_burned = false;
                     token_identifier = tokenId;
-                    burned_at = null;
                     burned_by = null;
+                    burned_at = null;
                     minted_at = Nat64.fromNat(Int.abs(Time.now()));
                     minted_by = caller;
                 };
@@ -643,6 +655,7 @@ actor class NFTLendingCanister(
                     case null List.nil<Nat>();
                 };
                 let updatedToTokens = List.push(tokenId, currentToTokens);
+                owners.put(to, updatedToTokens);
                 let txId = logTransaction(
                     "mint",
                     caller,
@@ -651,6 +664,7 @@ actor class NFTLendingCanister(
                         { key = "tokenId"; value = #NatContent(tokenId) }
                     ]
                 );
+                nextTokenId += 1;
                 #Ok(txId);
             };
         };
@@ -739,7 +753,7 @@ actor class NFTLendingCanister(
         amount : Nat,
         interestRate : Nat,
         duration : Int
-    ) : async Result<Nat> {
+        ) : async Result<Nat> {
         switch (tokens.get(tokenId)) {
             case (?token) {
                 if (token.is_burned) {

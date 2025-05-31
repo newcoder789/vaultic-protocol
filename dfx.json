@@ -16,7 +16,8 @@
     },
     "dip721_nft_container": {
       "type": "motoko",
-      "main": "src/dip721_nft/main.mo"
+      "main": "src/dip721_nft/main.mo",
+      "arguments": "(opt \"https://i.postimg.cc/XJQPssNX/Screenshot-2021-11-10-203714.png\", opt    \"VaultVerse NFTs\", opt \"VVNFT\", vec { principal             \"3tz33-zg5yy-jiy2n-lkytg-247fl-kbd6x-mfx5k-dukae-lqu7e-466ly-oae\"; principal \"klrif-eqbpo-l5c72-tfjlz-z4uep-62wna-5mpay-c2y5x-3fnto-pggh2-zae\" }, 1697059200000000000)"
     },
     "frontend": {
       "dependencies": [

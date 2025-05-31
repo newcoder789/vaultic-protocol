@@ -14,14 +14,6 @@ module {
     // A simple custom hash for Nat that reduces Nat to Nat32
     return Nat32.fromNat(n);
     };
-
-    public type DIP721Interface = {
-        balanceOf : shared query (owner : Principal) -> async Result<Nat>;
-        ownerOf : shared query (tokenId : Nat) -> async Result<Principal>;
-        tokenMetadata : shared query (tokenId : Nat) -> async Result<TokenMetadata>;
-        transfer : shared (to : Principal, tokenId : Nat) -> async Result<Nat>;
-    };
-
     public type SupportedInterface = {
         #Transfer;
         #Burn;
