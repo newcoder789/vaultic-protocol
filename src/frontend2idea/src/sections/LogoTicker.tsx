@@ -8,11 +8,11 @@ export const LogoTicker = () => {
   return<div>
    <div className='container'>
     <div>
-      <Image src={achmeLogo} alt='Acme Logo'/>
-      <Image src={quantumLogo} alt='Quantum Logo'/>
-      <Image src={celestialLogo} alt='Celestial Logo'/>
-      <Image src={pulseLogo} alt='pulse Logo'/>
-      <Image src={apexLogo} alt='Apex Logo'/>
+      <Image src={achmeLogo} alt='Acme Logo'className='logo-ticker-image'/>
+      <Image src={quantumLogo} alt='Quantum Logo' className='logo-ticker-image'/>
+      <Image src={celestialLogo} alt='Celestial Logo'className='logo-ticker-image'/>
+      <Image src={pulseLogo} alt='pulse Logo'className='logo-ticker-image'/>
+      <Image src={apexLogo} alt='Apex Logo'className='logo-ticker-image'/>
     </div>
 
     </div>
