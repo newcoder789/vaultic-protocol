@@ -217,7 +217,7 @@ actor VaultLending {
     { trusted_origins = trustedOrigins };
   };
 
-  // Metadata: Fetch DIP721 metadata
+  
   public shared func getDip721Metadata(canisterId: Principal, tokenId: Nat): async Result<NFTMetadata, NftError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (canisterId == thisCanister) {
@@ -249,7 +249,8 @@ actor VaultLending {
     };
   };
 
-  // Metadata: Normalize metadata
+
+
   public shared func normalizeMetadata(raw: NFTMetadata): async NormalizedMetadata {
     let attributes = Array.map<Attribute, (Text, Text)>(raw.attributes, func(attr) {
       (attr.trait_type, attr.value)
@@ -264,7 +265,8 @@ actor VaultLending {
     };
   };
 
-  // Helper: Compute risk score
+
+
   private func computeRiskScore(attrs: [(Text, Text)]): Float {
     var score = 0.0;
     for ((k, v) in attrs.vals()) {
@@ -274,17 +276,11 @@ actor VaultLending {
     score;
   };
 
-  // Helper: Find property value
-  private func findProperty(props: [Property], key: Text, default: Text): Text {
-    switch (Array.find(props, func(p: Property): Bool { p.key == key })) {
-      case (?prop) {
-        switch (prop.value) { case (#TextContent(t)) t; case (_) default };
-      };
-      case null { default };
-    };
-  };
 
-  // Collateral: Lock NFT
+
+
+
+
   public shared({ caller }) func lockNFT(
     canisterId: Principal,
     tokenId: Nat,
@@ -306,6 +302,8 @@ actor VaultLending {
       case (#Ok(false)) { return #Err(#Other("Ownership verification failed")) };
       case (#Err(_)) { return #Err(#Other("RAE2")) };
     };
+
+
     let dip721: DIP721Interface = actor(Principal.toText(canisterId));
     switch (await dip721.transferFrom(caller, thisCanister, tokenId)) {
       case (#Ok(txId)) {
@@ -332,7 +330,8 @@ actor VaultLending {
     };
   };
 
-  // Collateral: Unlock NFT
+
+
   public shared({ caller }) func unlockNFT(tokenId: Nat): async Result<Nat, LoanError> {
     switch (Trie.find(lockedNfts, { key = tokenId; hash = natHash(tokenId) }, Nat.equal)) {
       case (null) { return #Err(#Other("Unable to find lockINfo")) };
@@ -365,6 +364,15 @@ actor VaultLending {
 
   public query func getLockedNFT(tokenId: Nat): async ?LockInfo {
     Trie.find(lockedNfts, { key = tokenId; hash = natHash(tokenId) }, Nat.equal);
+
+  private func findProperty(props: [Property], key: Text, default: Text): Text {
+    switch (Array.find(props, func(p: Property): Bool { p.key == key })) {
+      case (?prop) {
+        switch (prop.value) { case (#TextContent(t)) t; case (_) default };
+      };
+      case null { default };
+    };
+  };
   };
 
   // Lending: Verify NFT ownership
@@ -372,7 +380,7 @@ actor VaultLending {
     nftCanisterId: Principal,
     tokenId: Nat,
     owner: Principal
-  ): async Result<Bool, LoanError> {
+    ): async Result<Bool, LoanError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (nftCanisterId == thisCanister) {
       return #Err(#Other("Cannot verify ownership for internal NFTs"));
@@ -393,7 +401,7 @@ actor VaultLending {
     amount: Nat,
     interestRate: Nat,
     duration: Int
-  ): async Result<Nat, LoanError> {
+    ): async Result<Nat, LoanError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (nftCanisterId == thisCanister) {
       return #Err(#Other("Cannot create loan with internal NFTs")); 

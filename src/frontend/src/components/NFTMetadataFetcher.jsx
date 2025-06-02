@@ -20,8 +20,8 @@ const NFTMetadataFetcher = () => {
     const [loanForm, setLoanForm] = useState({ tokenId: '', amount: '', interestRate: '', duration: '' });
     const [focusedTokenId, setFocusedTokenId] = useState(null);
 
-    const canisterPrincipal = 'u6s2n-gx777-77774-qaaba-cai'; // Replace with your VaultLending canister ID
-    const canisterId = 'uzt4z-lp777-77774-qaabq-cai'; // Replace with your DIP721 canister ID
+    const canisterPrincipal = 'u6s2n-gx777-77774-qaaba-cai'; 
+    const canisterId = 'uzt4z-lp777-77774-qaabq-cai'; 
     const fetchNFTs = async () => {
         if (!user) return;
         setLoading(true);
