@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import "boxicons/css/boxicons.min.css";
 
 // Animation variants
@@ -60,7 +61,7 @@ const Header = () => {
   return (
     <motion.header
       ref={headerRef}
-      className="flex justify-between items-center py-4 px-4 lg:px-20 bg-transparent"
+      className="flex justify-between items-center py-4 px-4 lg:px-20 bg-transparent relative z-50" // Ensure header has high z-index
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={{
@@ -114,15 +115,22 @@ const Header = () => {
       </motion.nav>
 
       {/* Connect Wallet Button */}
+      <Link
+      to="/dashboard"
+      className="z-50"
+      onClick={() => console.log("Link to /dashboard clicked")} // Debug click on Link
+      >
       <motion.button
         className="hidden md:block bg-[#a7a7a7] text-black py-3 px-8 rounded-full border-none font-medium transition-all duration-500 hover:bg-white cursor-pointer z-50"
         variants={navVariants}
         whileHover={{ scale: 1.05, backgroundColor: "#ffffff" }}
         whileTap={{ scale: 0.95 }}
         transition={{ duration: 0.3 }}
+        onClick={() => console.log("CONNECT WALLET button clicked")} // Debug click on button
       >
         CONNECT WALLET
       </motion.button>
+    </Link>
 
       {/* Mobile Menu Toggle */}
       <motion.button
@@ -169,6 +177,18 @@ const Header = () => {
                   {item}
                 </motion.a>
               ))}
+              {/* Connect Wallet Link in Mobile Menu */}
+              <Link to="/dashboard" onClick={toggleMobileMenu} className="z-50">
+                <motion.button
+                  className="bg-[#a7a7a7] text-black py-3 px-8 rounded-full border-none font-medium transition-all duration-500 hover:bg-white cursor-pointer z-50"
+                  variants={navVariants}
+                  whileHover={{ scale: 1.05, backgroundColor: "#ffffff" }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  CONNECT WALLET
+                </motion.button>
+              </Link>
             </motion.nav>
           </motion.div>
         )}
