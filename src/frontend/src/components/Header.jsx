@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "boxicons/css/boxicons.min.css";
 
 // Animation variants
@@ -48,10 +48,29 @@ const logoVariants = {
   },
 };
 
+const buttonVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+  hover: {
+    scale: 1.1,
+    boxShadow: "0 0 30px rgba(147, 51, 234, 0.8)", // Stronger purple glow on hover
+    background: "rgba(255, 255, 255, 0.1)", // Glassmorphism effect on hover
+  },
+  tap: { scale: 0.95 },
+};
+
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const headerRef = useRef(null);
   const isInView = useInView(headerRef, { once: true, amount: 0.5 });
+  const navigate = useNavigate(); // Add useNavigate hook
 
   // Toggle mobile menu
   const toggleMobileMenu = () => {
@@ -61,7 +80,7 @@ const Header = () => {
   return (
     <motion.header
       ref={headerRef}
-      className="flex justify-between items-center py-4 px-4 lg:px-20 bg-transparent relative z-50" // Ensure header has high z-index
+      className="flex justify-between items-center py-4 px-4 lg:px-20 bg-transparent relative z-50"
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={{
@@ -115,22 +134,17 @@ const Header = () => {
       </motion.nav>
 
       {/* Connect Wallet Button */}
-      <Link
-      to="/dashboard"
-      className="z-50"
-      onClick={() => console.log("Link to /dashboard clicked")} // Debug click on Link
-      >
       <motion.button
-        className="hidden md:block bg-[#a7a7a7] text-black py-3 px-8 rounded-full border-none font-medium transition-all duration-500 hover:bg-white cursor-pointer z-50"
-        variants={navVariants}
-        whileHover={{ scale: 1.05, backgroundColor: "#ffffff" }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ duration: 0.3 }}
-        onClick={() => console.log("CONNECT WALLET button clicked")} // Debug click on button
+        className="hidden md:block relative bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 px-8 rounded-full border-2 border-purple-300/50 font-medium backdrop-blur-sm bg-opacity-30 shadow-[0_0_20px_rgba(147,51,234,0.5)] hover:shadow-[0_0_30px_rgba(147,51,234,0.8)] z-50"
+        variants={buttonVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover="hover"
+        whileTap="tap"
+        onTap={() => navigate("/loan-lend")} // Navigate to /loan-lend
       >
         CONNECT WALLET
       </motion.button>
-    </Link>
 
       {/* Mobile Menu Toggle */}
       <motion.button
@@ -177,18 +191,21 @@ const Header = () => {
                   {item}
                 </motion.a>
               ))}
-              {/* Connect Wallet Link in Mobile Menu */}
-              <Link to="/dashboard" onClick={toggleMobileMenu} className="z-50">
-                <motion.button
-                  className="bg-[#a7a7a7] text-black py-3 px-8 rounded-full border-none font-medium transition-all duration-500 hover:bg-white cursor-pointer z-50"
-                  variants={navVariants}
-                  whileHover={{ scale: 1.05, backgroundColor: "#ffffff" }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  CONNECT WALLET
-                </motion.button>
-              </Link>
+              {/* Connect Wallet in Mobile Menu */}
+              <motion.button
+                className="relative bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 px-8 rounded-full border-2 border-purple-300/50 font-medium backdrop-blur-sm bg-opacity-30 shadow-[0_0_20px_rgba(147,51,234,0.5)] hover:shadow-[0_0_30px_rgba(147,51,234,0.8)] z-50"
+                variants={buttonVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                whileTap="tap"
+                onTap={() => {
+                  navigate("/loan-lend");
+                  toggleMobileMenu(); // Close menu after navigation
+                }}
+              >
+                CONNECT WALLET
+              </motion.button>
             </motion.nav>
           </motion.div>
         )}
