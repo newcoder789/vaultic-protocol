@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useRef } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Add react-router-dom imports
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import ImageSlider from "./components/ImageSlider";
@@ -14,7 +14,7 @@ import ProtocolStats from "./components/ProtocolStats";
 import GovernanceTokenomics from "./components/GovernanceTokenomics";
 import CallToAction from "./components/CallToAction";
 import Footer from "./components/Footer";
-import RiskDashboard from "./components/RiskDashboard"; // Import the Dashboard component
+import LoanLendPage from "./components/LoanLendPage"; // Import the LoanLendPage component
 
 // Animation variants
 const containerVariants = {
@@ -86,7 +86,7 @@ const LandingPage = () => {
     >
       {/* Gradient image with animation */}
       <motion.img
-        className="absolute top-0 right-0 opacity-60 -z-10"
+        className="absolute top-0 right-0 opacity-60 -z-20" // Adjusted z-index to be below Header
         src="/gradient.png"
         alt="Gradient-img"
         variants={imageVariants}
@@ -96,7 +96,7 @@ const LandingPage = () => {
 
       {/* Blur effect with animation */}
       <motion.div
-        className="h-0 w-[40rem] absolute top-[20%] right-[-5%] shadow-[0_0_900px_20px_#6464dc] -rotate-[30deg] -z-10"
+        className="h-0 w-[40rem] absolute top-[20%] right-[-5%] shadow-[0_0_900px_20px_#6464dc] -rotate-[30deg] -z-20" // Adjusted z-index
         variants={blurVariants}
         initial="hidden"
         animate="visible"
@@ -196,10 +196,30 @@ export default function App() {
           <Routes>
             {/* Landing page route */}
             <Route path="/" element={<LandingPage />} />
-            {/* Dashboard route */}
+            {/* Loan/Lend page route */}
+            <Route path="/loan-lend" element={<LoanLendPage />} />
+            {/* Placeholder routes for Loan and Lend */}
             <Route
-              path="/dashboard"
-              element={<RiskDashboard vault={{ id: 'mock-vault-id' }} />}
+              path="/loan"
+              element={
+                <div className="min-h-screen bg-gray-900 text-white">
+                  <Header />
+                  <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+                    <h2 className="text-3xl">Loan Page (Coming Soon)</h2>
+                  </div>
+                </div>
+              }
+            />
+            <Route
+              path="/lend"
+              element={
+                <div className="min-h-screen bg-gray-900 text-white">
+                  <Header />
+                  <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+                    <h2 className="text-3xl">Lend Page (Coming Soon)</h2>
+                  </div>
+                </div>
+              }
             />
             {/* 404 route */}
             <Route
