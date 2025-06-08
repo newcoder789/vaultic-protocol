@@ -1,4 +1,3 @@
- 
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useState, Suspense, useEffect } from "react";
@@ -7,6 +6,7 @@ import Header from "./components/header";
 import Hero from "./components/Hero";
 import ImageSlider from "./components/ImageSlider";
 
+import AOS from "aos";
 
 import CollectionSlider from "./components/CollectionSlider";
 import HomeWrapper from "./components/HomeWrapper";
@@ -24,6 +24,9 @@ import { useAuth } from "@nfid/identitykit/react"
 import NFTMetadataFetcher from "./components/NFTMetadataFetcher";
 import NFTMinter from "./components/NFTMinter";
 
+
+import get_data from "./helpers/nftagent";
+import { ImpulseJoint } from "../dist/assets/physics-dee4de67";
 
 
 // Animation variants
@@ -86,10 +89,12 @@ export default function App() {
         once: true,
       });
     });
+    get_data();
   }, []);
   
 
   useEffect(() => {
+    console.log("App component mounted");
     // Check if user is authenticated (e.g., via NFID)
     if (!isConnecting && user?.principal) {  
       console.log("User principal set:", user.principal);
@@ -98,6 +103,7 @@ export default function App() {
       console.log("User is not connected, principal is null");
       setUserPrincipal(null);
     }
+    get_data();
   }, [user, isConnecting]);
   // const ICP_API_HOST
   const generateImages = (prefix, count) =>

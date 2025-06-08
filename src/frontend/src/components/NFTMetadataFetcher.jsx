@@ -10,8 +10,7 @@ import {motion} from 'framer-motion';
 
 
 const NFTMetadataFetcher = () => {
-    
-    const { connect, disconnect, isConnecting, user } = useAuth()
+    const { connect, disconnect, isConnecting, user } = useAuth()   
     const [nfts, setNfts] = useState([]);
     // const [canisterId, setCanisterId] = useState('uzt4z-lp777-77774-qaabq-cai');
     const [loading, setLoading] = useState(false);
@@ -21,7 +20,7 @@ const NFTMetadataFetcher = () => {
     const [focusedTokenId, setFocusedTokenId] = useState(null);
 
     const canisterPrincipal = 'u6s2n-gx777-77774-qaaba-cai'; 
-    const canisterId = 'uzt4z-lp777-77774-qaabq-cai'; 
+    const canisterId = 'uzt4z-lp777-77774-qaabq-cai';  // dip canister id 
     const fetchNFTs = async () => {
         if (!user) return;
         setLoading(true);

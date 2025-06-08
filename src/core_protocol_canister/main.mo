@@ -364,7 +364,7 @@ actor VaultLending {
 
   public query func getLockedNFT(tokenId: Nat): async ?LockInfo {
     Trie.find(lockedNfts, { key = tokenId; hash = natHash(tokenId) }, Nat.equal);
-
+  };
   private func findProperty(props: [Property], key: Text, default: Text): Text {
     switch (Array.find(props, func(p: Property): Bool { p.key == key })) {
       case (?prop) {
@@ -373,7 +373,7 @@ actor VaultLending {
       case null { default };
     };
   };
-  };
+  
 
   // Lending: Verify NFT ownership
   public shared({ caller }) func verifyNFTOwnership(
