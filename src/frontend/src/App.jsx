@@ -15,6 +15,7 @@ import GovernanceTokenomics from "./components/GovernanceTokenomics";
 import CallToAction from "./components/CallToAction";
 import Footer from "./components/Footer";
 import LoanLendPage from "./components/LoanLendPage"; // Import the LoanLendPage component
+import LoanPage from "./components/LoanPage"; // Import the LoanPage component
 
 // Animation variants
 const containerVariants = {
@@ -194,22 +195,9 @@ export default function App() {
       <AnimatePresence>
         <Router>
           <Routes>
-            {/* Landing page route */}
             <Route path="/" element={<LandingPage />} />
-            {/* Loan/Lend page route */}
             <Route path="/loan-lend" element={<LoanLendPage />} />
-            {/* Placeholder routes for Loan and Lend */}
-            <Route
-              path="/loan"
-              element={
-                <div className="min-h-screen bg-gray-900 text-white">
-                  <Header />
-                  <div className="flex items-center justify-center h-[calc(100vh-64px)]">
-                    <h2 className="text-3xl">Loan Page (Coming Soon)</h2>
-                  </div>
-                </div>
-              }
-            />
+            <Route path="/loan" element={<LoanPage />} /> {/* Updated to render LoanPage */}
             <Route
               path="/lend"
               element={
@@ -221,7 +209,6 @@ export default function App() {
                 </div>
               }
             />
-            {/* 404 route */}
             <Route
               path="*"
               element={
