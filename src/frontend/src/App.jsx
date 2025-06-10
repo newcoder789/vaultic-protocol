@@ -16,6 +16,7 @@ import CallToAction from "./components/CallToAction";
 import Footer from "./components/Footer";
 import LoanLendPage from "./components/LoanLendPage"; // Import the LoanLendPage component
 import LoanPage from "./components/LoanPage"; // Import the LoanPage component
+import GiveLoanPage from "./components/GiveLoanPage";
 
 // Animation variants
 const containerVariants = {
@@ -197,18 +198,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/loan-lend" element={<LoanLendPage />} />
-            <Route path="/loan" element={<LoanPage />} /> {/* Updated to render LoanPage */}
-            <Route
-              path="/lend"
-              element={
-                <div className="min-h-screen bg-gray-900 text-white">
-                  <Header />
-                  <div className="flex items-center justify-center h-[calc(100vh-64px)]">
-                    <h2 className="text-3xl">Lend Page (Coming Soon)</h2>
-                  </div>
-                </div>
-              }
-            />
+            <Route path="/loan" element={<LoanPage />} />
+            <Route path="/lend" element={<GiveLoanPage />} />
             <Route
               path="*"
               element={
@@ -218,6 +209,7 @@ export default function App() {
               }
             />
           </Routes>
+
         </Router>
       </AnimatePresence>
     </Suspense>
