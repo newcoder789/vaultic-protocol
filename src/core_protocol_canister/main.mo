@@ -394,14 +394,6 @@ actor VaultLending {
     };
   };
 
-  // Lending: Create loan
-  public shared({ caller }) func createLoan(
-    nftCanisterId: Principal,
-    tokenId: Nat,
-    amount: Nat,
-    interestRate: Nat,
-    duration: Int
-    ): async Result<Nat, LoanError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (nftCanisterId == thisCanister) {
       return #Err(#Other("Cannot create loan with internal NFTs")); 

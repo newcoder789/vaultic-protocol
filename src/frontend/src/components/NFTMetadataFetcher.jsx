@@ -12,6 +12,8 @@ import {motion} from 'framer-motion';
 const NFTMetadataFetcher = () => {
     const { connect, disconnect, isConnecting, user } = useAuth()   
     const [nfts, setNfts] = useState([]);
+    const [actor, setActor] = useState(null);
+    const [dip721Actor, setDip721Actor] = useState(null);
     // const [canisterId, setCanisterId] = useState('uzt4z-lp777-77774-qaabq-cai');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -21,26 +23,38 @@ const NFTMetadataFetcher = () => {
 
     const canisterPrincipal = 'u6s2n-gx777-77774-qaaba-cai'; 
     const canisterId = 'uzt4z-lp777-77774-qaabq-cai';  // dip canister id 
+
+    useEffect(() => {
+        if(!isConnecting && user) {
+            const agent = new HttpAgent({ host: 'http://localhost:8080' });
+            agent.fetchRootKey();
+            const actor = Actor.createActor(idlFactory, {
+                agent,
+                canisterId: canisterPrincipal,
+            });
+            setActor(actor);
+            console.log("Actor created:", actor);
+            // Fetch owned token IDs from external canister
+            const dip721Actor = Actor.createActor(dip721IdlFactory, {
+                agent,
+                canisterId: canisterId,
+            });
+            console.log("DIP721 Actor created:", dip721Actor);
+            setDip721Actor(dip721Actor);
+            console.log("User principal:", user.principal);
+        }
+    }, [user, user?.principal, isConnecting]);
+    useEffect(() => {
+        if (user && actor && dip721Actor) {
+            fetchNFTs();
+        }
+    }, [user, actor, dip721Actor]);
     const fetchNFTs = async () => {
         if (!user) return;
         setLoading(true);
         setError(null);
         try {
-            if (!isConnecting && user?.principal) {
-                const agent = new HttpAgent({ host: 'http://localhost:8080' });
-                await agent.fetchRootKey();
-                const actor = Actor.createActor(idlFactory, {
-                    agent,
-                    canisterId: canisterPrincipal,
-                });
-                console.log("Actor created:", actor);
-                // Fetch owned token IDs from external canister
-                const dip721Actor = Actor.createActor(dip721IdlFactory, {
-                    agent,
-                    canisterId: canisterId,
-                });
-                console.log("DIP721 Actor created:", dip721Actor);
-                console.log("User principal:", user.principal);
+            if (!isConnecting && user?.principal ) {
                 const userPrincipal = user.principal;
                 const tokenIdsResult = await dip721Actor.ownerTokenIds(userPrincipal);
                 console.log("Token IDs result:", tokenIdsResult);
@@ -91,10 +105,6 @@ const NFTMetadataFetcher = () => {
             }
             const agent = new HttpAgent({ host: 'http://localhost:8080' });
             await agent.fetchRootKey();
-            const actor = Actor.createActor(idlFactory, {
-                agent,
-                canisterId: canisterPrincipal,
-            });
             const result = await actor.createLoan(
                 Principal.fromText(canisterId),
                 BigInt(loanForm.tokenId),     
@@ -144,11 +154,11 @@ const NFTMetadataFetcher = () => {
         }
     };
 
-    useEffect(() => {
-        if (user) {
-            fetchNFTs();
-        }
-    }, [user]);
+    // useEffect(() => {
+    //     if (user) {
+    //         fetchNFTs();
+    //     }
+    // }, [user]);
 
     const handleCardFocus = (tokenId) => {
         setFocusedTokenId(tokenId);
@@ -186,7 +196,9 @@ const NFTMetadataFetcher = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: focusedTokenId === nft.tokenId ? 1.08 : 1 }}
                         transition={{ duration: 0.3 }}
-                        onClick={() => handleCardFocus(nft.tokenId)}
+                        onClick={() => {
+                            handleCardFocus(nft.tokenId)
+                            console.log("Focused token ID:", nft.tokenId);}}
                         style={{
                             zIndex: focusedTokenId === nft.tokenId ? 10 : 1,
                             boxShadow: focusedTokenId === nft.tokenId ? '0 0 0 4px #e99b63, 0 8px 32px rgba(0,0,0,0.25)' : '',
@@ -205,6 +217,7 @@ const NFTMetadataFetcher = () => {
                                     type="hidden"
                                     name="tokenId"
                                     value={nft.tokenId}
+                                    readOnly
                                 />
                                 <input
                                     type="number"

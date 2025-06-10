@@ -1,4 +1,3 @@
-import { useAgent } from "@nfid/identitykit/react";
 
 // const agent = useAgent();
 
@@ -10,15 +9,16 @@ import { useAgent } from "@nfid/identitykit/react";
 // import entrepotIDL from './candid/entrepot.did';
 
 // const nftActor = useMemo(() => {
-//     if (!agent) return null;
-
-//     return Actor.createActor(dip721Idl, {
-//         agent,
-//         canisterId: DIP721_CANISTER_ID,
-//     });
-// }, [agent]);
-
-
+    //     if (!agent) return null;
+    
+    //     return Actor.createActor(dip721Idl, {
+        //         agent,
+        //         canisterId: DIP721_CANISTER_ID,
+        //     });
+        // }, [agent]);
+        
+        
+// import { useAgent } from "@nfid/identitykit/react";
 import { idlFactory as dip721IdlFactory } from "../../../declarations/dip721_nft_container/dip721_nft_container.did.js"; // Adjust the path as necessary
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { useAuth } from "@nfid/identitykit/react";
@@ -54,8 +54,5 @@ export default async function get_data() {
     if (r2[0].hasOwnProperty("metadata")) {
         const metadata = await entrepot.decodeTokenId(r2[0].metadata);
         console.log("letsee the data we extraxted:", metadata);
-    }
-
-
-    
+    }    
 }
