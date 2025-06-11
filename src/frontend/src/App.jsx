@@ -17,7 +17,8 @@ import Footer from "./components/Footer";
 import LoanLendPage from "./components/LoanLendPage"; // Import the LoanLendPage component
 import LoanPage from "./components/LoanPage"; // Import the LoanPage component
 import GiveLoanPage from "./components/GiveLoanPage";
-
+import LoansPage from "./components/LoansPage"
+import Dashboard from "./components/Dashboard";
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -200,6 +201,8 @@ export default function App() {
             <Route path="/loan-lend" element={<LoanLendPage />} />
             <Route path="/loan" element={<LoanPage />} />
             <Route path="/lend" element={<GiveLoanPage />} />
+            <Route path="/active-loans" element={<LoansPage />} />
+            <Route path="/Dashboard" element={<Dashboard/>} />
             <Route
               path="*"
               element={
