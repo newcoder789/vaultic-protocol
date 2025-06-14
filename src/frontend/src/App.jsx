@@ -19,6 +19,7 @@ import LoanPage from "./components/LoanPage"; // Import the LoanPage component
 import GiveLoanPage from "./components/GiveLoanPage";
 import LoansPage from "./components/LoansPage"
 import Dashboard from "./components/Dashboard";
+import Profile from "./components/Profile";
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -203,6 +204,7 @@ export default function App() {
             <Route path="/lend" element={<GiveLoanPage />} />
             <Route path="/active-loans" element={<LoansPage />} />
             <Route path="/Dashboard" element={<Dashboard/>} />
+            <Route path="/profile" element={<Profile />} />
             <Route
               path="*"
               element={
