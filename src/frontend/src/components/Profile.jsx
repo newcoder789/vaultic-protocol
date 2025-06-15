@@ -6,7 +6,7 @@ const Profile = () => {
       <div className="bg-gray-800 p-8 rounded-xl w-full max-w-lg shadow-lg">
         <div className="flex flex-col items-center space-y-4">
           <img
-            src="/img/avatar.png"
+            src="/img/Nfts/male1.jpg"
             alt="Avatar"
             className="w-24 h-24 rounded-full border-4 border-pink-500"
           />
