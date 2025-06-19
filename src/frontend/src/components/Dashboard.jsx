@@ -17,6 +17,7 @@ import {
 import Header from "./Header2";
 import Footer from "./Footer";
 
+// Sample data
 const dataLoans = [
   { month: "Jan", value: 400 },
   { month: "Feb", value: 600 },
@@ -42,6 +43,7 @@ const Dashboard = () => {
           Dashboard Overview
         </h1>
 
+        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-[#1e1e3f] p-6 rounded-2xl shadow-md text-center">
             <h2 className="text-lg font-semibold text-purple-300">Wallet Balance</h2>
@@ -57,6 +59,7 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div className="bg-[#1e1e3f] p-6 rounded-2xl shadow-md">
             <h2 className="text-xl font-semibold mb-4 text-purple-200">Loan Activity Over Time</h2>
@@ -66,7 +69,7 @@ const Dashboard = () => {
                 <XAxis dataKey="month" stroke="#ccc" />
                 <YAxis stroke="#ccc" />
                 <Tooltip contentStyle={{ backgroundColor: "#1f1f3d", borderColor: "#8b5cf6" }} />
-                <Line type="monotone" dataKey="value" stroke="#ec4899" strokeWidth={2} activeDot={{ r: 6 }} isAnimationActive={true} />
+                <Line type="monotone" dataKey="value" stroke="#ec4899" strokeWidth={2} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -87,6 +90,7 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Loan Stats */}
         <div className="bg-[#1e1e3f] mt-12 p-6 rounded-2xl shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-indigo-200">Loan Stats by Type</h2>
           <ResponsiveContainer width="100%" height={250}>
@@ -100,6 +104,7 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
+        {/* Risk Engine */}
         <div className="bg-[#1e1e3f] mt-12 p-6 rounded-2xl shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-indigo-200">Risk Engine Insights</h2>
           <ul className="space-y-2">
@@ -120,6 +125,36 @@ const Dashboard = () => {
               <span className="text-red-400 font-bold">1.2%</span>
             </li>
           </ul>
+        </div>
+
+        {/* 🆕 Active Loan Summary */}
+        <div className="bg-[#1e1e3f] mt-12 p-6 rounded-2xl shadow-md">
+          <h2 className="text-xl font-semibold mb-4 text-purple-200">Active Loan Summary</h2>
+          <ul className="space-y-3 text-sm">
+            <li className="flex justify-between">
+              <span className="text-gray-400">Amount Borrowed:</span>
+              <span className="font-semibold text-white">ICP 4.213</span>
+            </li>
+            <li className="flex justify-between">
+              <span className="text-gray-400">Due Date:</span>
+              <span className="font-semibold text-white">27 Jun 2025</span>
+            </li>
+            <li className="flex justify-between">
+              <span className="text-gray-400">Daily Interest:</span>
+              <span className="font-semibold text-white">0.021 ICP</span>
+            </li>
+            <li className="flex justify-between">
+              <span className="text-gray-400">Remaining Balance:</span>
+              <span className="font-semibold text-white">ICP 4.552</span>
+            </li>
+            <li className="flex justify-between">
+              <span className="text-gray-400">Countdown to Liquidation:</span>
+              <span className="font-semibold text-red-400">6 Days 14 Hours</span>
+            </li>
+          </ul>
+          <button className="mt-6 w-full bg-pink-600 hover:bg-pink-700 transition px-6 py-2 rounded-full text-white font-bold">
+            Repay Now
+          </button>
         </div>
       </div>
       <Footer />
