@@ -20,6 +20,8 @@ import GiveLoanPage from "./components/GiveLoanPage";
 import LoansPage from "./components/LoansPage"
 import Dashboard from "./components/Dashboard";
 import Profile from "./components/Profile";
+import Governance from "./components/Governance";
+import TokenRewards from "./components/TokenRewards";
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -205,6 +207,8 @@ export default function App() {
             <Route path="/active-loans" element={<LoansPage />} />
             <Route path="/Dashboard" element={<Dashboard/>} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/governance" element={<Governance />} />
+            <Route path="/token-rewards" element={<TokenRewards/>} />
             <Route
               path="*"
               element={
