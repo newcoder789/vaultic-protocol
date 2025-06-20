@@ -1,5 +1,4 @@
 // Set this before rendering the component
-InternetIdentity.providerUrl = "http://localhost:8080/?canisterId=umunu-kh777-77774-qaaca-cai"; 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -12,6 +11,7 @@ import { IdentityKitProvider, IdentityKitTheme } from "@nfid/identitykit/react"
 import { IdentityKitAuthType } from "@nfid/identitykit";
 import { NFIDW, InternetIdentity, Stoic, OISY } from "@nfid/identitykit"
 
+InternetIdentity.providerUrl = "http://localhost:4943/?canisterId=umunu-kh777-77774-qaaca-cai"; 
 
 
 
@@ -20,7 +20,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <IdentityKitProvider
       authType={IdentityKitAuthType.ACCOUNTS}
       signerClientOptions={{
-        targets: ["core_protocol_canister", "auction_governance_canister"],
+        targets: ["core_protocol_canister", "auction_governance_canister","dip721_nft_container "],
+        derivationOrigin: "https://uzt4z-lp777-77774-qaabq-cai.icp0.io",
       }}
       signers={[
         InternetIdentity,

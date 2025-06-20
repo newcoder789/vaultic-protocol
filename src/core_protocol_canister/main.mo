@@ -14,16 +14,25 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Trie "mo:base/Trie";
 import Debug "mo:base/Debug";
+import DIP721InterfaceModule "../src/interfaces/DIP721Interface";
+
 
 actor VaultLending {
   // Types
   public type Result<T, E> = { #Ok : T; #Err : E };
   public type NftError = {
-    #Unauthorized;
+    #SelfTransfer;
     #TokenNotFound;
     #TxNotFound;
+    #BurnedNFT;
+    #SelfApprove;
+    #OperatorNotFound;
+    #Unauthorized;
+    #ExistedNFT;
+    #OwnerNotFound;
     #Other : Text;
-  };
+    #Unknown;
+    };
     
   public type LoanError = {
     #Unauthorized;
@@ -37,6 +46,7 @@ actor VaultLending {
     key: Text;
     value: { #TextContent : Text; #NatContent : Nat; #IntContent : Int; #BoolContent : Bool; #Principal : Principal };
   };
+  
   public type NFTMetadata = {
     tokenId: ?Nat;
     name: Text;
@@ -91,12 +101,152 @@ actor VaultLending {
     origins: [Text];
   };
 
-  // DIP721 Interface
-  type DIP721Interface = actor {
-    transferFrom : (Principal, Principal, Nat) -> async Result<Nat, NftError>;
-    ownerTokenIds : (Principal) -> async Result<[Nat], NftError>;
-    tokenMetadata : (Nat) -> async Result<{ properties : [Property] }, NftError>;
-  };
+  // // DIP721 Interface
+  // type DIP721InterfaceModule.DIP721Interface  = actor {
+  //   transferFrom : (Principal, Principal, Nat) -> async Result<Nat, NftError>;
+  //   ownerTokenIds : (Principal) -> async Result<[Nat], NftError>;
+  //   tokenMetadata : (Nat) -> async Result<{ properties : [Property] }, NftError>;
+  // };
+  // type DIP721InterfaceModule.DIP721Interface  = actor {
+    
+    // type Property = {
+    //     key   : Text;
+    //     value : {
+    //     #Nat64Content  : Nat64;
+    //     #Nat32Content  : Nat32;
+    //     #BoolContent   : Bool;
+    //     #Nat8Content   : Nat8;
+    //     #Int64Content  : Int64;
+    //     #IntContent    : Int;
+    //     #NatContent    : Nat;
+    //     #Nat16Content  : Nat16;
+    //     #Int32Content  : Int32;
+    //     #Int8Content   : Int8;
+    //     #Int16Content  : Int16;
+    //     #BlobContent   : Blob;
+    //     #NestedContent : Property;
+    //     #Principal     : Principal;
+    //     #TextContent   : Text;
+    //   };
+    //   };
+
+    // // Loan-specific types
+    // type Loan = {
+    //     tokenId : Nat;
+    //     lender : Principal;
+    //     borrower : Principal;
+    //     amount : Nat;
+    //     interestRate : Nat;
+    //     duration : Int;
+    //     startTime : Int;
+    //     isActive : Bool;
+    //     isRepaid : Bool;
+    //     isLiquidated : Bool;
+    //   };
+
+    // // DIP-721 types
+
+    // type Result<T> = {
+    //     #Ok : T;
+    //     #Err : NftError;
+    //   };
+
+    // type Metadata = {
+    //     logo : ?Text;
+    //     name : ?Text;
+    //     symbol : ?Text;
+    //     custodians : [Principal];
+    //     created_at : Int;
+    //     upgraded_at : Int;
+    //   };
+
+    // private type TokenMetadata = {
+    //     transferred_at : ?Nat64;
+    //     transferred_by : ?Principal;
+    //     owner : ?Principal;
+    //     operator : ?Principal;
+    //     properties : [Property];
+    //     is_burned : Bool;
+    //     token_identifier : Nat;
+    //     burned_at : ?Nat64;
+    //     burned_by : ?Principal;
+    //     minted_at : Nat64;
+    //     minted_by : Principal;
+    //   };
+
+    // type TxEvent = {
+    //     time : Nat64;
+    //     operation : Text;
+    //     details : [Property];
+    //     caller : Principal;
+    //   };
+
+    // type NftError = {
+    //     #SelfTransfer;
+    //     #TokenNotFound;
+    //     #TxNotFound;
+    //     #BurnedNFT;
+    //     #SelfApprove;
+    //     #OperatorNotFound;
+    //     #Unauthorized;
+    //     #ExistedNFT;
+    //     #OwnerNotFound;
+    //     #Other : Text;
+    //     #Unknown;
+    //   };
+    // // Basic Interface
+    // supportedInterfaces : query () -> async [{
+    //     #Transfer;
+    //     #Burn;
+    //     #Mint;
+    //     #Approval;
+    //     #TransactionHistory;
+    //   }];
+    // tokenMetadata : query (tokenId : Nat) -> async Result<TokenMetadata>;
+    // balanceOf : query (owner : Principal) -> async Result<Nat>;
+    // totalSupply : query () -> async Nat;
+    // ownerOf : query (tokenId : Nat) -> async Result<Principal>;
+    // ownerTokenIds : query (owner : Principal) -> async Result<[Nat]>;
+    // ownerTokenMetadata : query (owner : Principal) -> async Result<[TokenMetadata]>;
+    // operatorOf : query (tokenId : Nat) -> async Result<Principal>;
+    // operatorTokenIds : query (operator : Principal) -> async Result<[Nat]>;
+    // operatorTokenMetadata : query (operator : Principal) -> async Result<[TokenMetadata]>;
+    // setCustodians : shared (custodians : [Principal]) -> async ();
+    // setLogo : shared (logo : Text) -> async ();
+    // setName : shared (name : Text) -> async ();
+    // setSymbol : shared (symbol : Text) -> async ();
+    // custodians : query () -> async [Principal];
+    // logo : query () -> async ?Text;
+    // name : query () -> async ?Text;
+    // symbol : query () -> async ?Text;
+    // metadata : query () -> async Metadata;
+
+    // // Approval Interface
+    // approve : shared (operator : Principal, tokenId : Nat) -> async Result<Nat>;
+    // setApprovalForAll : shared (operator : Principal, toggle : Bool) -> async Result<Nat>;
+    // isApprovedForAll : query (owner : Principal, operator : Principal) -> async Result<Nat>;
+
+    // // Transfer Interface
+    // transfer : shared (to : Principal, tokenId : Nat) -> async Result<Nat>;
+    // transferFrom : shared (from : Principal, to : Principal, tokenId : Nat) -> async Result<Nat>;
+
+    // // Mint Interface
+    // mint : shared (to : Principal, properties : [Property]) -> async Result<Nat>;
+
+    // // Burn Interface
+    // burn : shared (tokenId : Nat) -> async Result<Nat>;
+
+    // // History Interface
+    // transaction : query (txId : Nat) -> async Result<TxEvent>;
+    // totalTransactions : query () -> async Nat;
+
+    // // Lending Protocol Interface
+    // createLoan : shared (tokenId : Nat, amount : Nat, interestRate : Nat, duration : Int) -> async Result<Nat>;
+    // acceptLoan : shared (tokenId : Nat) -> async Result<Nat>;
+    // repayLoan : shared (tokenId : Nat) -> async Result<Nat>;
+    // liquidateLoan : shared (tokenId : Nat) -> async Result<Nat>;
+    // getLoan : query (tokenId : Nat) -> async Result<Loan>;
+    // };
 
   // Stable storage
   private stable var loanEntries: [(Nat, Loan)] = [];
@@ -122,7 +272,7 @@ actor VaultLending {
     var logo = ?"https://vaultverse.example.com/logo.png";
     var name = ?"VaultVerse Lending";
     var symbol = ?"VLT";
-    var custodians = [Principal.fromText("wyhxy-a475w-6tnmf-z3cny-xttnv-2aws6-buvnj-vtch5-b3qf4-qebqk-xqe")];
+    var custodians = [Principal.fromText("lsoj4-xkphy-rbr5d-a5c3x-i2g7g-rxc5g-h77ih-vozzu-qsrrz-bwiui-2ae"),Principal.fromText("3tz33-zg5yy-jiy2n-lkytg-247fl-kbd6x-mfx5k-dukae-lqu7e-466ly-oae"),Principal.fromText("klrif-eqbpo-l5c72-tfjlz-z4uep-62wna-5mpay-c2y5x-3fnto-pggh2-zae")];
     var created_at = Time.now();
     var upgraded_at = Time.now();
   };
@@ -217,13 +367,29 @@ actor VaultLending {
     { trusted_origins = trustedOrigins };
   };
 
-  
+  public shared func getDip721CanisterName(canisterId: Principal): async Result<Text,Text>{
+    let thisCanister = Principal.fromActor(VaultLending);
+    if(canisterId == thisCanister){
+      return #Err("Bruh u cant ask for id of this canister itself \n anyway it is: VaultLending")
+    };
+    let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(canisterId));
+    let nameOpt: ?Text = await dip721.name();
+     switch (nameOpt) {
+      case (?name) {
+        return #Ok("Name of Canister is: " # name);
+      };
+      case null {
+        return #Err("No name found in DIP721 interface");
+      };
+    };
+  };
+
   public shared func getDip721Metadata(canisterId: Principal, tokenId: Nat): async Result<NFTMetadata, NftError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (canisterId == thisCanister) {
       return #Err(#Other("No internal NFTs"));
     };
-    let dip721: DIP721Interface = actor(Principal.toText(canisterId));
+    let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(canisterId));
     switch (await dip721.tokenMetadata(tokenId)) {
       case (#Ok(metadata)) {
         #Ok({
@@ -277,6 +443,14 @@ actor VaultLending {
   };
 
 
+  private func findProperty(props: [Property], key: Text, default: Text): Text {
+    switch (Array.find(props, func(p: Property): Bool { p.key == key })) {
+      case (?prop) {
+        switch (prop.value) { case (#TextContent(t)) t; case (_) default };
+      };
+      case null { default };
+    };
+  };
 
 
 
@@ -284,8 +458,8 @@ actor VaultLending {
   public shared({ caller }) func lockNFT(
     canisterId: Principal,
     tokenId: Nat,
-    condition: Text
-  ): async Result<Nat, LoanError> {
+    condition: Text,
+    ): async Result<Nat, LoanError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (canisterId == thisCanister) {
       return #Err(#Other("Cannot lock internal NFTs"));
@@ -302,9 +476,7 @@ actor VaultLending {
       case (#Ok(false)) { return #Err(#Other("Ownership verification failed")) };
       case (#Err(_)) { return #Err(#Other("RAE2")) };
     };
-
-
-    let dip721: DIP721Interface = actor(Principal.toText(canisterId));
+    let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(canisterId));
     switch (await dip721.transferFrom(caller, thisCanister, tokenId)) {
       case (#Ok(txId)) {
         let lockInfo: LockInfo = {
@@ -326,7 +498,7 @@ actor VaultLending {
         );
         #Ok(logId);
       };
-      case (#Err(e)) { #Err(#Other("BIg BOss Error")) };
+      case (#Err(e)) { #Err(#Other("BIg BOss Error" # debug_show(e))) };
     };
   };
 
@@ -339,7 +511,7 @@ actor VaultLending {
         if (caller != lockInfo.owner and not isCustodian(caller)) {
           return #Err(#Unauthorized);
         };
-        let dip721: DIP721Interface = actor(Principal.toText(lockInfo.canisterId));
+        let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(lockInfo.canisterId));
         let thisCanister = Principal.fromActor(VaultLending);
         switch (await dip721.transferFrom(thisCanister, lockInfo.owner, tokenId)) {
           case (#Ok(txId)) {
@@ -365,14 +537,6 @@ actor VaultLending {
   public query func getLockedNFT(tokenId: Nat): async ?LockInfo {
     Trie.find(lockedNfts, { key = tokenId; hash = natHash(tokenId) }, Nat.equal);
   };
-  private func findProperty(props: [Property], key: Text, default: Text): Text {
-    switch (Array.find(props, func(p: Property): Bool { p.key == key })) {
-      case (?prop) {
-        switch (prop.value) { case (#TextContent(t)) t; case (_) default };
-      };
-      case null { default };
-    };
-  };
   
 
   // Lending: Verify NFT ownership
@@ -385,7 +549,7 @@ actor VaultLending {
     if (nftCanisterId == thisCanister) {
       return #Err(#Other("Cannot verify ownership for internal NFTs"));
     };
-    let dip721: DIP721Interface = actor(Principal.toText(nftCanisterId));
+    let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(nftCanisterId));
     switch (await dip721.ownerTokenIds(owner)) {
       case (#Ok(tokenIds)) {
         #Ok(Array.find(tokenIds, func(id: Nat): Bool { id == tokenId }) != null);
@@ -393,7 +557,13 @@ actor VaultLending {
       case (#Err(_)) { #Err(#Other("tokne ownership issue")) };
     };
   };
-
+  public shared({ caller }) func createLoan(
+    nftCanisterId: Principal,
+    tokenId: Nat,
+    amount: Nat,
+    interestRate: Nat,
+    duration: Int
+    ): async Result<Nat, LoanError> {
     let thisCanister = Principal.fromActor(VaultLending);
     if (nftCanisterId == thisCanister) {
       return #Err(#Other("Cannot create loan with internal NFTs")); 
@@ -417,10 +587,10 @@ actor VaultLending {
           case (#Ok(true)) {};
           case (#Err(_)) { return #Err(#Other("RandomError")) };
         };
-        switch (await lockNFT(nftCanisterId, tokenId, "{\"ltv\":0.5}")) {
-          case (#Err(_)) { return #Err(#Other("Not able to lock ")) };
-          case (#Ok(_)) {};
-        };
+        // switch (await lockNFT(nftCanisterId, tokenId, "{\"ltv\":0.5}")) {
+        //   case (#Err(_)) { return #Err(#Other("Not able to lock ")) };
+        //   case (#Ok(_)) {};
+        // };
         switch (Trie.find(loans, { key = tokenId; hash = natHash(tokenId) }, Nat.equal)) {
           case (?loan) {
             if (loan.isActive and not loan.isRepaid and not loan.isLiquidated) {
@@ -478,7 +648,7 @@ actor VaultLending {
               return #Err(#Unauthorized);
             };
             let thisCanister = Principal.fromActor(VaultLending);
-            let dip721: DIP721Interface = actor(Principal.toText(loan.nftCanisterId));
+            let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(loan.nftCanisterId));
             switch (await dip721.transferFrom(thisCanister, caller, loan.tokenId)) {
               case (#Ok(txId)) {
                 let updatedLoan: Loan = {
@@ -527,7 +697,7 @@ actor VaultLending {
             if (lockInfo.owner != caller) {
               return #Err(#Unauthorized);
             };
-            let dip721: DIP721Interface = actor(Principal.toText(loan.nftCanisterId));
+            let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(loan.nftCanisterId));
             switch (await dip721.transferFrom(caller, loan.lender, loan.tokenId)) {
               case (#Ok(txId)) {
                 let updatedLoan: Loan = {
@@ -572,7 +742,7 @@ actor VaultLending {
         switch (Trie.find(lockedNfts, { key = loan.tokenId; hash = natHash(loan.tokenId) }, Nat.equal)) {
           case (null) { return #Err(#NFTNotLocked) };
           case (?lockInfo) {
-            let dip721: DIP721Interface = actor(Principal.toText(loan.nftCanisterId));
+            let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(loan.nftCanisterId));
             switch (await dip721.transferFrom(lockInfo.owner, loan.lender, loan.tokenId)) {
               case (#Ok(id)) {
                 let updatedLoan: Loan = {
@@ -625,7 +795,7 @@ actor VaultLending {
     Trie.size(transactions);
   };
 
-  // Canister
+  // Canist
   public query func logo(): async ?Text {
     canisterMetadata.logo;
   };
@@ -641,6 +811,43 @@ actor VaultLending {
   public query func getcustodians(): async [Principal] {
     canisterMetadata.custodians;
   };
+  public shared func scoreLocalNFT(tokenId: Nat, canisterId: Principal) : async Result<Nat, NftError> {
+    var score = 50;
+    let dip721: DIP721InterfaceModule.DIP721Interface  = actor(Principal.toText(canisterId));
+    // let  canisterId: Principal = Principal.fromText("uzt4z-lp777-77774-qaabq-cai");
+    let result: Result<NFTMetadata, NftError> = await getDip721Metadata(canisterId, tokenId );
+    switch(result){
+      case(#Err(x)){
+        return #Err(#TokenNotFound);
+      };case(#Ok(NFTMetadata)){
+          var score = 50;
+
+          for (attr in NFTMetadata.attributes.vals()) {
+            switch (attr.trait_type, attr.value) {
+              case ("Rarity", "Legendary") { score += 25 };
+              case ("Rarity", "Rare") { score += 15 };
+              case ("Rarity", "Common") { score -= 10 };
+              case ("Type", "Alien") { score += 10 };
+              case ("Type", "Zombie") { score += 5 };
+              case _ {}; // Ignore others
+            }
+          };
+
+          if (score > 100) { score := 100 };
+          return #Ok(score);
+      };
+    }
+    // for (p in props.vals()) {
+    //   switch (p.key, p.value) {
+    //     case ("Rarity", #TextContent("Legendary")) { score += 20 };
+    //     case ("Rarity", #TextContent("Common")) { score -= 10 };
+    //     case ("Type", #TextContent("Alien")) { score += 5 };
+    //     // ... add more logic
+    //     case _ {}; // ignore
+    //   };
+    // };
+    // return Nat.min(score, 100); // cap max score
+  };
 
   public shared({ caller }) func setCustodians(newCustodians: [Principal]): async () {
     if (not isCustodian(caller)) {
@@ -653,4 +860,12 @@ actor VaultLending {
       [{ key = "custodians"; value = #TextContent(Principal.toText(caller)) }]
     );
     };
+
+  public func testMetadata() : async Text {
+    let dip721 = actor("uzt4z-lp777-77774-qaabq-cai") : DIP721InterfaceModule.DIP721Interface;
+    let nftCanisterId: Principal = Principal.fromText("uzt4z-lp777-77774-qaabq-cai");
+    let meta = await getDip721Metadata(nftCanisterId, 0);
+    return "Success!";
+  };
+
 };

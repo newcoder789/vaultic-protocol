@@ -13,6 +13,7 @@ import Time "mo:base/Time";
 import Nat32 "mo:base/Nat32";
 import Int "mo:base/Int";
 
+
 import Generic "./Generic";
 
 actor class NFTLendingCanister(
@@ -26,7 +27,6 @@ actor class NFTLendingCanister(
     private func hashNat(n : Nat) : Hash.Hash {
         Nat32.fromNat(n);
     };
-
     // Metadata for the canister
     private stable var canisterMetadata : {
         var logo : ?Text;
@@ -35,11 +35,11 @@ actor class NFTLendingCanister(
         var custodians : [Principal];
         var created_at : Int;
         var upgraded_at : Int;
-    } = {
-        var logo = _logo;
-        var name = _name;
-        var symbol = _symbol;
-        var custodians = _custodians;
+        } = {
+        var logo = ?"https://vaultverse.example.com/logo.png";
+        var name = ?"VaultVerse Lending";
+        var symbol = ?"VVNFT";
+        var custodians = [Principal.fromText("lsoj4-xkphy-rbr5d-a5c3x-i2g7g-rxc5g-h77ih-vozzu-qsrrz-bwiui-2ae"),Principal.fromText("3tz33-zg5yy-jiy2n-lkytg-247fl-kbd6x-mfx5k-dukae-lqu7e-466ly-oae"),Principal.fromText("klrif-eqbpo-l5c72-tfjlz-z4uep-62wna-5mpay-c2y5x-3fnto-pggh2-zae")];
         var created_at = _created_at;
         var upgraded_at = Time.now();
     };
@@ -76,7 +76,7 @@ actor class NFTLendingCanister(
         isRepaid : Bool;
         isLiquidated : Bool;
     };
-
+    
     // DIP-721 types
     public type SupportedInterface = {
         #Transfer;
@@ -84,7 +84,7 @@ actor class NFTLendingCanister(
         #Mint;
         #Approval;
         #TransactionHistory;
-    };
+        };
 
     public type Result<T> = {
         #Ok : T;
@@ -203,7 +203,7 @@ actor class NFTLendingCanister(
         operation : Text,
         caller : Principal,
         details : [Generic.Property]
-    ) : Nat {
+        ) : Nat {
         let txId = nextTxId;
         nextTxId += 1;
         let tx : TxEvent = {
@@ -615,7 +615,11 @@ actor class NFTLendingCanister(
             case null { #Err(#TokenNotFound) };
         };
     };
-
+    
+    
+    public query func getTokenById(id : Nat) : async ?TokenMetadata {
+        tokens.get(id)
+    };
     // --- MintInterface Implementation ---
 
     private var nextTokenId : Nat = 1;
@@ -668,6 +672,9 @@ actor class NFTLendingCanister(
                 #Ok(txId);
             };
         };
+    };
+    public query func getNextTokenId() : async Nat {
+        nextTokenId
     };
 
     // --- BurnInterface Implementation ---
@@ -762,7 +769,7 @@ actor class NFTLendingCanister(
                 switch (token.owner) {
                     case (?owner) {
                         if (owner != caller) {
-                            return #Err(#Unauthorized);
+                            return #Err(#Other("Unoruthorized: Caller is not the owner of the token"#  Nat.toText(tokenId) # "owner:" # Principal.toText(owner) # "caller:" # Principal.toText(caller))); 
                         };
                         switch (loans.get(tokenId)) {
                             case (?loan) {

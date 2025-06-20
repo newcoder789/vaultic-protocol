@@ -11,6 +11,10 @@ Please enter the passphrase for your identity: [hidden]
 Decryption complete.
 (variant { Ok = 1 : nat })
 
+dfx start --clean --background --host 127.0.0.1:4943
+
+
+wyhxy-a475w-6tnmf-z3cny-xttnv-2aws6-buvnj-vtch5-b3qf4-qebqk-xqe
 
 
 
@@ -18,6 +22,30 @@ Decryption complete.
 Please enter the passphrase for your identity: [hidden]
 Decryption complete.
 (variant { Err = variant { Other = "Cannot create loan with internal NFTs" } })
+
+
+
+https://i.postimg.cc/XJQPssNX/Screenshot-2021-11-10-203714.png
+VaultVerse NFTs
+VVNFT
+lsoj4-xkphy-rbr5d-a5c3x-i2g7g-rxc5g-h77ih-vozzu-qsrrz-bwiui-2ae
+3tz33-zg5yy-jiy2n-lkytg-247fl-kbd6x-mfx5k-dukae-lqu7e-466ly-oae
+klrif-eqbpo-l5c72-tfjlz-z4uep-62wna-5mpay-c2y5x-3fnto-pggh2-zae
+1697059200000000000
+(opt \"\", opt    \"  \", opt \"\", vec { prin      cipal             \"\"; principal \"\" }, )"
+
+
+
+
+dfx canister call dip721_nft_container mint '(
+  principal "lsoj4-xkphy-rbr5d-a5c3x-i2g7g-rxc5g-h77ih-vozzu-qsrrz-bwiui-2ae",
+  vec {
+    record { key = "name"; value = variant { TextContent = "Ghost Singer" } };
+    record { key = "image"; value = variant { TextContent = "https://i.postimg.cc/XJQPssNX/Screenshot-2021-11-10-203714.png" } };
+    record { key = "Rarity"; value = variant { TextContent = "Legendary" } };
+    record { key = "Type"; value = variant { TextContent = "Alien" } }
+  }
+)' --network local
 
 
 
