@@ -38,9 +38,7 @@ const NFTMetadataFetcher = () => {
                     });
                     const res2 = authenticatedAgent.fetchRootKey();;
                     console.log("result for root key", res);
-                    console.log(res2);
-                    window.authenticatedAgent.fetchRootKey();
-                      
+                    console.log(res2);                      
                 } catch (err) {
                     console.error(err);
                 }

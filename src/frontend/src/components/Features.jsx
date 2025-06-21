@@ -5,45 +5,45 @@ import { GiHammerBreak } from 'react-icons/gi';
 
 // Features data with icon components
 const FEATURES = [
-    {
-        id: 'motoko-icp',
-        Icon: SiInternetcomputer,
-        title: 'Built on Motoko & ICP',
-        description:
-            'Leverages Motoko’s actor-based model for scalable, secure, and decentralized NFT lending on the Internet Computer.',
-    },
-    {
-        id: 'dynamic-risk',
-        Icon: RiShieldKeyholeLine,
-        title: 'Dynamic Risk Modeling',
-        description:
-            'Uses on-chain risk scoring and adjustable LTV ratios to ensure safe lending, powered by real-time market data.',
-    },
-    {
-        id: 'on-chain-liquidation',
-        Icon: GiHammerBreak,
-        title: 'On-Chain Liquidation',
-        description:
-            'Automated liquidation and auction system ensures fairness and transparency for overdue loans.',
-    },
+  {
+    id: 'motoko-icp',
+    Icon: SiInternetcomputer,
+    title: 'Built on Motoko & ICP',
+    description:
+      'Leverages Motoko’s actor-based model for scalable, secure, and decentralized NFT lending on the Internet Computer.',
+  },
+  {
+    id: 'dynamic-risk',
+    Icon: RiShieldKeyholeLine,
+    title: 'Dynamic Risk Modeling',
+    description:
+      'Uses on-chain risk scoring and adjustable LTV ratios to ensure safe lending, powered by real-time market data.',
+  },
+  {
+    id: 'on-chain-liquidation',
+    Icon: GiHammerBreak,
+    title: 'On-Chain Liquidation',
+    description:
+      'Automated liquidation and auction system ensures fairness and transparency for overdue loans.',
+  },
 ];
 
 // Feature Card component
 const FeatureCard = ({ feature }) => {
-    const { Icon, title, description, id } = feature;
+  const { Icon, title, description, id } = feature;
 
-    return (
-        <article
-            className="bg-[#2a1a3a]/50 rounded-2xl p-6 text-center transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-            data-testid={`feature-card-${id}`}
-        >
-            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-white text-3xl rounded-full shadow-lg">
-                <Icon />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-            <p className="text-gray-300 text-sm">{description}</p>
-        </article>
-    );
+  return (
+    <article
+      className="bg-[#2a1a3a]/50 rounded-2xl p-6 text-center transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+      data-testid={`feature-card-${id}`}
+    >
+      <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-white text-3xl rounded-full shadow-lg">
+        <Icon />
+      </div>
+      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+      <p className="text-gray-300 text-sm">{description}</p>
+    </article>
+  );
 };
 
 // Main Features component

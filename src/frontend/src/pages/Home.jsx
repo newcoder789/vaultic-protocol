@@ -6,23 +6,22 @@ import Header from "../components/header";
 import Hero from "../components/Hero";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import NFTMetadataFetcher from "../components/NFTMetadataFetcher"; // Import the new component
 
 
 
 export default function App() {
   const [userPrincipal, setUserPrincipal] = useState(null);
-  useEffect(() => {
-    AOS.init({
-      duration: 1500,
-      once: true,
-    });
+  // useEffect(() => {
+  //   AOS.init({
+  //     duration: 1500,
+  //     once: true,
+  //   });
 
-    // Check if user is authenticated (e.g., via Internet Identity or Plug)
-    // if (window.ic?.plug?.principalId) {
-    //   setUserPrincipal(window.ic.plug.principalId);
-    // }
-  }, []);
+  //   // Check if user is authenticated (e.g., via Internet Identity or Plug)
+  //   // if (window.ic?.plug?.principalId) {
+  //   //   setUserPrincipal(window.ic.plug.principalId);
+  //   // }
+  // }, []);
 
 
   return (
