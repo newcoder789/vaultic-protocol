@@ -258,7 +258,7 @@ const LoanPage = () => {
           )}
 
           {activeTab === "my-loans" && (
-          <motion.div className="w-full max-w-3xl mt-10 space-y-10" variants={sectionVariants}>
+          <motion.div className="w-full max-w-3xl mt-10 space-y-10 min-h-[80vh]" variants={sectionVariants}>
             {/* Active Loans */}
             <div>
               <h2 className="text-2xl font-semibold mb-3">Active Loans</h2>
