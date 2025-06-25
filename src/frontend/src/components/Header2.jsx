@@ -19,12 +19,20 @@ const navVariants = {
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const headerRef = useRef(null);
   const isInView = useInView(headerRef, { once: true, amount: 0.5 });
   const navigate = useNavigate();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
-  const toggleProfile = () => setIsProfileOpen((prev) => !prev);
+  const toggleProfile = () => {
+    setIsProfileOpen((prev) => !prev);
+    setIsNotificationsOpen(false);
+  };
+  const toggleNotifications = () => {
+    setIsNotificationsOpen((prev) => !prev);
+    setIsProfileOpen(false);
+  };
 
   return (
     <motion.header
@@ -62,11 +70,7 @@ const Header = () => {
           { name: "Active Loans", path: "/active-loans" },
           { name: "Dashboard", path: "/dashboard" },
         ].map(({ name, path }) => (
-          <motion.div
-            key={name}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <motion.div key={name} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Link className="text-base text-white hover:text-gray-300" to={path}>
               {name}
             </Link>
@@ -74,8 +78,9 @@ const Header = () => {
         ))}
       </motion.nav>
 
-      {/* Right Side: Wallet + Profile */}
+      {/* Right Side */}
       <div className="flex items-center gap-4 relative z-50">
+        {/* Connect Wallet Button */}
         <motion.button
           className="hidden md:block bg-gradient-to-r from-purple-600 to-pink-500 text-white py-2 px-6 rounded-full shadow-lg hover:shadow-xl"
           whileHover={{ scale: 1.05 }}
@@ -85,6 +90,37 @@ const Header = () => {
           CONNECT WALLET
         </motion.button>
 
+        {/* Notification Bell */}
+        <div className="relative">
+          <motion.div
+            className="cursor-pointer relative"
+            onClick={toggleNotifications}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <i className="bx bx-bell text-white text-2xl" />
+            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+          </motion.div>
+
+          <AnimatePresence>
+            {isNotificationsOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute right-0 mt-2 w-72 bg-white text-black rounded-lg shadow-lg p-4 z-50"
+              >
+                <h3 className="font-semibold text-gray-800 mb-2">Notifications</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="border-b pb-2">🎉 Your loan was approved!</li>
+                  <li className="border-b pb-2">📨 You received a new offer.</li>
+                  <li className="pb-2">⚠️ 1 day left to repay your loan.</li>
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {/* Profile Icon */}
         <motion.div
           className="relative cursor-pointer"
@@ -93,64 +129,54 @@ const Header = () => {
           whileTap={{ scale: 0.95 }}
         >
           <i className="bx bx-user-circle text-white text-3xl" />
-          {/* Dropdown */}
-            <AnimatePresence>
-              {isProfileOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg p-4 text-black"
-                >
-                  <p className="font-semibold">Ayush Rawat</p>
-                  <p className="text-sm text-gray-600">ayushrawat4404@gmail.com</p>
-                  <hr className="my-2" />
-                  <ul className="space-y-2 text-sm">
-                    <li>
-                      <button
-                        onClick={() => alert("Go to Profile")}
-                        className="hover:underline text-black w-full text-left"
-                      >
-                        View Profile
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => alert("Go to Settings")}
-                        className="hover:underline text-black w-full text-left"
-                      >
-                        Settings
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => alert("Go to Notifications")}
-                        className="hover:underline text-black w-full text-left"
-                      >
-                        Notifications
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => alert("Help & Support")}
-                        className="hover:underline text-black w-full text-left"
-                      >
-                        Help & Support
-                      </button>
-                    </li>
-                    <li>
-                      <hr className="my-2" />
-                      <button
-                        onClick={() => alert("Logged out")}
-                        className="text-red-500 hover:underline w-full text-left"
-                      >
-                        Log out
-                      </button>
-                    </li>
-                  </ul>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg p-4 text-black"
+              >
+                <p className="font-semibold">Ayush Rawat</p>
+                <p className="text-sm text-gray-600">ayushrawat4404@gmail.com</p>
+                <hr className="my-2" />
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <button
+                      onClick={() => {
+                        navigate("/profile");
+                        setIsProfileOpen(false);
+                      }}
+                      className="hover:underline text-black w-full text-left"
+                    >
+                      View Profile
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => alert("Go to Settings")} className="hover:underline text-black w-full text-left">
+                      Settings
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => alert("Go to Notifications")} className="hover:underline text-black w-full text-left">
+                      Notifications
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => alert("Help & Support")} className="hover:underline text-black w-full text-left">
+                      Help & Support
+                    </button>
+                  </li>
+                  <li>
+                    <hr className="my-2" />
+                    <button onClick={() => alert("Logged out")} className="text-red-500 hover:underline w-full text-left">
+                      Log out
+                    </button>
+                  </li>
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Hamburger (Mobile) */}
@@ -196,3 +222,4 @@ const Header = () => {
 };
 
 export default Header;
+
