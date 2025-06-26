@@ -1,7 +1,16 @@
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "boxicons/css/boxicons.min.css";
+import { useAuth } from "@nfid/identitykit/react"
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { idlFactory } from "../../../declarations/core_protocol_canister/core_protocol_canister.did.js";
+import { useAgent } from "@nfid/identitykit/react"
+import { useIdentity } from "@nfid/identitykit/react"
+import { createAgent } from "@dfinity/utils";
+
+import { AuthClient } from "@dfinity/auth-client";
+
 
 // Animation variants
 const navVariants = {
@@ -15,16 +24,113 @@ const navVariants = {
     },
   },
 };
-
 const Header = () => {
+  const { connect, disconnect, isConnecting, user } = useAuth()
+  const [agent, setAgent] = useState(null);
+  const  [client, setClient] =useState(null);
+  const [myIdentity, setMyIdentity] = useState(null);
+  const [userPrincipal, setUserPrincipal] = useState(null);
+  // const agent = useAgent({ host: "http://localhost:8080" });
+  // const identity = useIdentity()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profile, setProfile] = useState(null);
   const headerRef = useRef(null);
   const isInView = useInView(headerRef, { once: true, amount: 0.5 });
   const navigate = useNavigate();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
+  // const agent = useAgent()
   const toggleProfile = () => setIsProfileOpen((prev) => !prev);
+
+  useEffect(() => {
+    console.log("📦 useEffect triggered");
+    let cancelled = false;
+
+    const fetchProfile = async (agent, myIdentity) => {
+      try {
+        if (!user?.principal) {
+          console.warn("🚨 No user principal. Are you logged in?");
+          await connect();
+          return;
+        }
+        if (!agent) {
+          console.warn("🚨 No authenticated agent yet.");
+          return;
+        }
+
+        // if (process.env.NODE_ENV === "development") {
+          
+        // }
+        const canisterID = "u6s2n-gx777-77774-qaaba-cai"
+        const actor = Actor.createActor(idlFactory, {
+          agent: agent,
+          canisterId: canisterID
+          
+        });
+
+        console.log("🎭 actor created");
+        // console.log("✅ Root key fetched:", Buffer.from(agent.rootKey).toString("base64"));
+        // const identity = await agent.getIdentity();
+        console.log("Delegation chain:", JSON.stringify(myIdentity.getDelegation().toJSON(), null, 2));
+        // const expiration = Number(agent.delegation.expiration) / 1_000_000; // Convert nanoseconds to milliseconds
+        // console.log("Delegation expiration:", new Date(expiration).toISOString());
+        // await actor.set_profile({
+        //   username: "NimbuDev",
+        //   bio: "IC Builder",
+        //   profilePicUrl: "example.com",
+        //   joinedAt: Date.now()
+        // });
+
+        console.log("✅ set_profile called");
+
+        const fetchedProfile = await actor.get_profile(userPrincipal);
+        console.log("🎯 fetchedProfile:", fetchedProfile);
+
+        if (!cancelled && fetchedProfile !== null) {
+          setProfile(fetchedProfile);
+        }
+      } catch (err) {
+        console.error("❌ Error in fetchProfile:", err);
+      }
+    };
+    if (!user?.principal) {
+      // User not logged in, do not create agent or fetch profile
+      return;
+    }
+
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const host = isLocal ? "http://localhost:8080" : "https://icp0.io"; // <-- update to your backend server if needed
+
+    AuthClient.create().then(async (client) => {
+      setClient(client);
+      const myIdentity = client.getIdentity();
+      setMyIdentity(myIdentity);
+      console.log("Agent identity:", myIdentity.getPrincipal().toText());
+      setUserPrincipal(myIdentity.getPrincipal());
+      const agent = new HttpAgent({
+        identity: myIdentity,
+        host,
+        fetchRootKey: isLocal, 
+      });
+      setAgent(agent);
+
+      if (isLocal) {
+        try {
+          await agent.fetchRootKey();
+        } catch (err) {
+          console.warn("⚠️ Could not fetch root key from local replica");
+          console.error(err);
+          return; 
+        }
+      }
+
+      fetchProfile(agent, myIdentity);
+    }).catch((err) => {
+      console.error("AuthClient error:", err);
+    });
+    },[user]);
+  
 
   return (
     <motion.header
@@ -76,16 +182,30 @@ const Header = () => {
 
       {/* Right Side: Wallet + Profile */}
       <div className="flex items-center gap-4 relative z-50">
-        <motion.button
-          className="hidden md:block bg-gradient-to-r from-purple-600 to-pink-500 text-white py-2 px-6 rounded-full shadow-lg hover:shadow-xl"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate("/loan-lend")}
-        >
-          CONNECT WALLET
-        </motion.button>
-
+          {!user ? (
+            <button
+              onClick={()=>connect()}
+              
+            className="hidden md:block bg-gradient-to-r from-purple-600 to-pink-500 text-white py-2 px-6 rounded-full shadow-lg hover:shadow-xl"
+              disabled={isConnecting}
+            >
+              {isConnecting ? "Connecting..." : "Connect Wallet"}
+            </button>
+          ) : (
+            <>
+              <span className="text-xs md:text-sm opacity-80">{user.principal.toText()}</span>
+              <button
+                onClick={disconnect}
+                className="px-3 py-1 bg-gray-700 rounded text-white hover:bg-gray-800 transition ml-2"
+              >
+                Disconnect
+              </button>
+            </>
+          )}
         {/* Profile Icon */}
+        <div>
+          {user&& profile? profile:"USernot login"}
+        </div>
         <motion.div
           className="relative cursor-pointer"
           onClick={toggleProfile}

@@ -15,7 +15,7 @@ import Time "mo:base/Time";
 import Trie "mo:base/Trie";
 import Debug "mo:base/Debug";
 import DIP721InterfaceModule "../src/interfaces/DIP721Interface";
-
+import HashMap "mo:base/HashMap";
 
 actor VaultLending {
   // Types
@@ -97,10 +97,18 @@ actor VaultLending {
     name: Text;
     url: Text;
   };
+
+
+
   public type TrustedOrigin = {
     origins: [Text];
   };
-
+  public type UserProfile = {
+    username: Text;
+    bio: Text;
+    profilePicUrl: Text;
+    joinedAt: Int;
+  };
   // // DIP721 Interface
   // type DIP721InterfaceModule.DIP721Interface  = actor {
   //   transferFrom : (Principal, Principal, Nat) -> async Result<Nat, NftError>;
@@ -255,11 +263,15 @@ actor VaultLending {
   private stable var nextTxId: Nat = 0;
   private stable var nextLoanId: Nat = 0;
   private stable var custodians: [Principal] = [];
-
+  
   // In-memory state with explicit types
   private var loans: Trie.Trie<Nat, Loan> = Trie.empty();
   private var lockedNfts: Trie.Trie<Nat, LockInfo> = Trie.empty();
   private var transactions: Trie.Trie<Nat, TxEvent> = Trie.empty();
+  func principalHash(p: Principal): Nat32 {
+    return Text.hash(Principal.toText(p));
+  };
+  var users = HashMap.HashMap<Principal, UserProfile>(10,Principal.equal, principalHash);
 
   private stable var canisterMetadata: {
     var logo: ?Text;
@@ -847,6 +859,13 @@ actor VaultLending {
     //   };
     // };
     // return Nat.min(score, 100); // cap max score
+  };
+  
+  public shared({caller}) func set_profile(profile: UserProfile): async () {  
+    users.put(caller, profile);
+  };
+  public query func get_profile(who: Principal): async ?UserProfile {
+    return users.get(who);
   };
 
   public shared({ caller }) func setCustodians(newCustodians: [Principal]): async () {

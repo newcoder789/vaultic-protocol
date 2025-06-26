@@ -2,11 +2,12 @@
   "canisters": {
     "internet_identity": {
       "type": "custom",
-      "candid": "internet_identity/internet_identity.did",
-      "wasm": "internet_identity/internet_identity_dev.wasm.gz",
-      "build": ""
+      "candid": "https://github.com/dfinity/internet-identity/releases/download/release-2025-04-04-v3/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2025-04-04-v3/internet_identity_dev.wasm.gz",
+      "init_arg": "(opt record { captcha_config = opt record { max_unsolved_captchas= 50:nat64; captcha_trigger = variant {Static = variant {CaptchaDisabled}}}})",
+      "frontend": {}
     },
-    "core_protocol_canister": {
+   "core_protocol_canister": {
       "main": "src/core_protocol_canister/main.mo",
       "type": "motoko"
     },
