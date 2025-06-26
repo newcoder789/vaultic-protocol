@@ -51,6 +51,23 @@ const LoanPage = () => {
   const [userNFTs, setUserNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState("");
   const [activeTab, setActiveTab] = useState("new-loan");
+    // Chat system
+  const [chatOpen, setChatOpen] = useState(null);
+  const [chatMessages, setChatMessages] = useState({});
+  const [chatInput, setChatInput] = useState("");
+
+  const toggleChat = (offerId) => {
+    setChatOpen(chatOpen === offerId ? null : offerId);
+    setChatInput("");
+  };
+
+  const sendMessage = (offerId) => {
+    if (!chatInput.trim()) return;
+    const messages = chatMessages[offerId] || [];
+    const newMessages = [...messages, { sender: "You", text: chatInput }];
+    setChatMessages((prev) => ({ ...prev, [offerId]: newMessages }));
+    setChatInput("");
+  };
 
   useEffect(() => {
     const mockNFTs = [
@@ -282,38 +299,73 @@ const LoanPage = () => {
                 {[1, 2].map((offerId) => (
                   <motion.div
                     key={offerId}
-                    className="bg-gray-900 p-5 rounded-lg shadow-md text-gray-300 flex flex-col md:flex-row justify-between items-start md:items-center"
-                    initial="hidden"
-                    animate="visible"
+                    className="bg-gray-900 p-5 rounded-lg shadow-md text-gray-300 flex flex-col gap-4"
                     variants={sectionVariants}
                   >
-                    <div>
-                      <div className="text-white font-medium">Offer #{offerId}</div>
-                      <div className="text-sm text-gray-400">CryptoPunk #1234 • 12 ICP • 4 months</div>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="text-white font-medium">Offer #{offerId}</div>
+                        <div className="text-sm text-gray-400">CryptoPunk #1234 • 12 ICP • 4 months</div>
+                      </div>
+                      <div className="flex gap-3">
+                        <motion.button
+                          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => alert(`Offer #${offerId} accepted!`)}
+                        >
+                          Accept
+                        </motion.button>
+                        <motion.button
+                          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-medium"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => alert(`Offer #${offerId} rejected.`)}
+                        >
+                          Reject
+                        </motion.button>
+                        <button
+                          className="text-blue-400 underline"
+                          onClick={() => toggleChat(offerId)}
+                        >
+                          Chat 💬
+                        </button>
+                      </div>
                     </div>
-                    <div className="mt-4 md:mt-0 flex gap-3">
-                      <motion.button
-                        className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => alert(`Offer #${offerId} accepted!`)}
-                      >
-                        Accept
-                      </motion.button>
-                      <motion.button
-                        className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-medium"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => alert(`Offer #${offerId} rejected.`)}
-                      >
-                        Reject
-                      </motion.button>
-                    </div>
+
+                    {/* Chat Box */}
+                    {chatOpen === offerId && (
+                      <div className="bg-gray-800 rounded-lg p-4 mt-4">
+                        <div className="h-40 overflow-y-auto space-y-2 mb-4">
+                          {(chatMessages[offerId] || []).map((msg, idx) => (
+                            <div key={idx} className="text-sm">
+                              <span className="font-semibold">{msg.sender}:</span> {msg.text}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            placeholder="Type a message..."
+                            className="flex-1 px-4 py-2 bg-gray-700 text-white rounded"
+                          />
+                          <button
+                            onClick={() => sendMessage(offerId)}
+                            className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white"
+                          >
+                            Send
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 ))}
               </div>
             </motion.div>
           )}
+          
         </motion.main>
 
         <Footer />
