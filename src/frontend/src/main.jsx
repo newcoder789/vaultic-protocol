@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <IdentityKitProvider
       authType={IdentityKitAuthType.STANDARD}
       signerClientOptions={{
-        targets: ["core_protocol_canister", "auction_governance_canister", "dip721_nft_container "],
+        targets: ["u6s2n-gx777-77774-qaaba-cai", "uxrrr-q7777-77774-qaaaq-cai", "uzt4z-lp777-77774-qaabq-cai"],
         derivationOrigin: "http://localhost:3000",
         // derivationOrigin: "https://ulvla-h7777-77774-qaacq-cai.icp0.io",  
       }}
