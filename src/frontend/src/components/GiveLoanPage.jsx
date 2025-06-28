@@ -20,6 +20,26 @@ const GiveLoanPage = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [filter, setFilter] = useState("all");
   const [offersSent, setOffersSent] = useState([]);
+  const [hoveredUser, setHoveredUser] = useState(null);
+  // Chat system
+  const [chatOpen, setChatOpen] = useState(null);
+  const [chatMessages, setChatMessages] = useState({});
+  const [chatInput, setChatInput] = useState("");
+
+  const userProfiles = {
+    "0xf5bb52": {
+      name: "Alice.eth",
+      reputation: "4.5/5",
+      loan_history: "12 Loans • 95% Repaid",
+      profile_pic: "/images/avatars/avatar1.png",
+    },
+    "0xced9f8": {
+      name: "Bob.eth",
+      reputation: "4.8/5",
+      loan_history: "20 Loans • 100% Repaid",
+      profile_pic: "/images/avatars/avatar2.png",
+    },
+  };
 
   useEffect(() => {
     const mockLoans = [
@@ -87,6 +107,24 @@ const GiveLoanPage = () => {
 
   const handleOfferLoan = (loanId) => {
     alert(`Offer made on ${loanId}!`);
+  };
+
+  const toggleChat = (offerId) => {
+    setChatOpen(chatOpen === offerId ? null : offerId);
+    setChatInput("");
+  };
+
+  const sendMessage = (offerId) => {
+    if (!chatInput.trim()) return;
+
+    setChatMessages((prev) => ({
+      ...prev,
+      [offerId]: [
+        ...(prev[offerId] || []),
+        { sender: "You", text: chatInput },
+      ],
+    }));
+    setChatInput("");
   };
 
   return (
@@ -260,12 +298,55 @@ const GiveLoanPage = () => {
                           </div>
 
                           <ul className="text-sm text-gray-300 space-y-1 mb-4">
-                            <li>
+                            <li className="relative group">
                               <span className="text-purple-300 font-medium">
                                 Borrower:
                               </span>{" "}
-                              {loan.borrower}
+                              <span
+                                onMouseEnter={() =>
+                                  setHoveredUser(loan.borrower)
+                                }
+                                onMouseLeave={() => setHoveredUser(null)}
+                                className="cursor-pointer text-blue-400 hover:underline relative"
+                              >
+                                {loan.borrower}
+
+                                {/* Hover Box */}
+                                {hoveredUser === loan.borrower &&
+                                  userProfiles[loan.borrower] && (
+                                    <div className="absolute z-20 top-8 left-0 w-64 bg-gray-800 text-white rounded-lg shadow-lg p-4 text-sm border border-purple-700">
+                                      <div className="flex items-center mb-2">
+                                        <img
+                                          src={
+                                            userProfiles[loan.borrower]
+                                              .profile_pic
+                                          }
+                                          alt="profile"
+                                          className="w-10 h-10 rounded-full mr-2"
+                                        />
+                                        <div>
+                                          <div className="font-bold text-white">
+                                            {userProfiles[loan.borrower].name}
+                                          </div>
+                                          <div className="text-xs text-gray-400">
+                                            {
+                                              userProfiles[loan.borrower]
+                                                .reputation
+                                            }
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="text-gray-300">
+                                        {
+                                          userProfiles[loan.borrower]
+                                            .loan_history
+                                        }
+                                      </div>
+                                    </div>
+                                  )}
+                              </span>
                             </li>
+
                             <li>
                               <span className="text-pink-300 font-medium">
                                 Principle:
@@ -446,13 +527,15 @@ const GiveLoanPage = () => {
                 initial="hidden"
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-                className="grid md:grid-cols-2 gap-6"
+                className="grid md:grid-row-2 gap-6"
               >
                 {offersSent.map((offer) => (
                   <motion.div
                     key={offer.id}
                     variants={floatUpVariant}
-                    className="bg-gray-800 p-6 rounded-lg shadow-md hover:bg-gray-700 transition"
+                    className={`bg-gray-900 p-6 rounded-lg shadow-md ${
+                      chatOpen === offer.id ? "" : "hover:bg-gray-700"
+                    } transition`}
                   >
                     <div className="flex items-center gap-3 mb-4">
                       <img
@@ -476,17 +559,56 @@ const GiveLoanPage = () => {
                         {offer.borrower}
                       </span>
                     </div>
-                    <div
-                      className={`mt-4 text-sm font-semibold ${
-                        offer.status === "Accepted"
-                          ? "text-green-400"
-                          : offer.status === "Rejected"
-                          ? "text-red-400"
-                          : "text-yellow-400"
-                      }`}
-                    >
-                      Status: {offer.status}
+                    <div className="mt-4 flex justify-between items-center">
+                      <div
+                        className={`text-sm font-semibold ${
+                          offer.status === "Accepted"
+                            ? "text-green-400"
+                            : offer.status === "Rejected"
+                            ? "text-red-400"
+                            : "text-yellow-400"
+                        }`}
+                      >
+                        Status: {offer.status}
+                      </div>
+                      <button
+                        onClick={() => toggleChat(offer.id)}
+                        className="text-sm text-blue-400 underline hover:text-blue-300  "
+                        aria-label={`Toggle chat with ${offer.borrower}`}
+                      >
+                        Chat 💬
+                      </button>
                     </div>
+                    {/* Chat Box */}
+                    {chatOpen === offer.id && (
+                      <div className="mt-4 bg-gray-700 rounded-lg p-4">
+                        <div className="h-40 overflow-y-auto space-y-2 mb-4">
+                          {(chatMessages[offer.id] || []).map((msg, idx) => (
+                            <div key={idx} className="text-sm text-white">
+                              <span className="font-semibold">{msg.sender}:</span>{" "}
+                              {msg.text}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            placeholder="Type a message..."
+                            className="flex-1 px-4 py-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            aria-label="Chat message input"
+                          />
+                          <button
+                            onClick={() => sendMessage(offer.id)}
+                            className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            aria-label="Send chat message"
+                          >
+                            Send
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 ))}
               </motion.div>
