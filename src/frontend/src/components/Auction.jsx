@@ -1,4 +1,3 @@
-// src/components/Auction.jsx
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -37,8 +36,9 @@ const auctionsMock = [
 ];
 
 const Auction = () => {
-  const [auctions, setAuctions] = useState(auctionsMock);
+  const [auctions, setAuctions] = useState([]);
   const [bidInputs, setBidInputs] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleBid = (id) => {
     const enteredBid = parseFloat(bidInputs[id]);
@@ -68,11 +68,20 @@ const Auction = () => {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAuctions([...auctions]); // trigger rerender
+    // Simulate fetching data with a 1-second delay
+    const timer = setTimeout(() => {
+      setAuctions(auctionsMock);
+      setIsLoading(false);
     }, 1000);
-    return () => clearInterval(interval);
-  }, [auctions]);
+
+    const interval = setInterval(() => {
+      setAuctions((prevAuctions) => [...prevAuctions]); // Ensure state update triggers rerender
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white relative overflow-hidden">
@@ -88,6 +97,10 @@ const Auction = () => {
           0% { transform: translateY(0); opacity: 0.2; }
           50% { opacity: 0.4; }
           100% { transform: translateY(-100vh); opacity: 0; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
 
@@ -111,67 +124,90 @@ const Auction = () => {
       <Header />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-20 py-20 relative z-10 min-h-[90vh]">
-        <motion.h1
-          className="text-5xl font-bold mb-8 text-center"
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          Live{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 drop-shadow-[0_0_15px_rgba(147,51,234,0.7)]">
-            Auction
-          </span>
-        </motion.h1>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {auctions.map((auction) => (
-            <motion.div
-              key={auction.id}
-              className="bg-gray-800 rounded-lg p-6 border border-purple-600/40 shadow-md hover:shadow-purple-700 transition"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+        {isLoading ? (
+          <div
+            className="flex justify-center items-center"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: "20",
+            }}
+          >
+            <div
+              className="w-16 h-16 border-4 border-t-4 border-purple-500 border-solid rounded-full"
+              style={{
+                borderTopColor: "#9333ea",
+                animation: "spin 1s linear infinite",
+              }}
+            />
+          </div>
+        ) : (
+          <>
+            <motion.h1
+              className="text-5xl font-bold mb-8 text-center"
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
             >
-              <img
-                src={auction.nft.image}
-                alt={auction.nft.name}
-                className="w-full h-60 object-cover rounded mb-4"
-              />
-              <h2 className="text-xl font-semibold">{auction.nft.name}</h2>
-              <p className="text-gray-400 text-sm mt-1 mb-4">
-                Ends in:{" "}
-                <span className="text-purple-300">
-                  {getTimeRemaining(auction.endTime)}
-                </span>
-              </p>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-300">Current Bid:</span>
-                <span className="text-green-400 font-semibold">
-                  {auction.currentBid} ICP
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  placeholder="Your bid in ICP"
-                  value={bidInputs[auction.id] || ""}
-                  onChange={(e) =>
-                    setBidInputs((prev) => ({
-                      ...prev,
-                      [auction.id]: e.target.value,
-                    }))
-                  }
-                  className="flex-1 px-4 py-2 rounded bg-gray-900 text-white border border-purple-500 focus:outline-none"
-                />
-                <button
-                  onClick={() => handleBid(auction.id)}
-                  className="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded text-white font-semibold"
+              Live{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 drop-shadow-[0_0_15px_rgba(147,51,234,0.7)]">
+                Auction
+              </span>
+            </motion.h1>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {auctions.map((auction) => (
+                <motion.div
+                  key={auction.id}
+                  className="bg-gray-800 rounded-lg p-6 border border-purple-600/40 shadow-md hover:shadow-purple-700 transition"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                 >
-                  Bid
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  <img
+                    src={auction.nft.image}
+                    alt={auction.nft.name}
+                    className="w-full h-60 object-cover rounded mb-4"
+                  />
+                  <h2 className="text-xl font-semibold">{auction.nft.name}</h2>
+                  <p className="text-gray-400 text-sm mt-1 mb-4">
+                    Ends in:{" "}
+                    <span className="text-purple-300">
+                      {getTimeRemaining(auction.endTime)}
+                    </span>
+                  </p>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-300">Current Bid:</span>
+                    <span className="text-green-400 font-semibold">
+                      {auction.currentBid} ICP
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="Your bid in ICP"
+                      value={bidInputs[auction.id] || ""}
+                      onChange={(e) =>
+                        setBidInputs((prev) => ({
+                          ...prev,
+                          [auction.id]: e.target.value,
+                        }))
+                      }
+                      className="flex-1 px-4 py-2 rounded bg-gray-900 text-white border border-purple-500 focus:outline-none"
+                    />
+                    <button
+                      onClick={() => handleBid(auction.id)}
+                      className="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded text-white font-semibold"
+                    >
+                      Bid
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
+        )}
       </main>
 
       <Footer />
