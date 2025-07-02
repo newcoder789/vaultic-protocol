@@ -1,9 +1,11 @@
+// src/components/Auction.jsx
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
+import NFTModal from "./NFTModal";
 
-// ✅ Animation variant for headings
+// ✅ Animation variant
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
@@ -20,6 +22,15 @@ const auctionsMock = [
     nft: {
       name: "Bored Ape #5678",
       image: "/img/Nfts/2.webp",
+      description: "A rare Bored Ape from the original collection.",
+      attributes: [
+        { trait_type: "Fur", value: "Golden" },
+        { trait_type: "Eyes", value: "Laser" },
+      ],
+      bids: [
+        { user: "0xAb...123", amount: 12.5, timeAgo: "2h ago" },
+        { user: "0xCd...456", amount: 10.8, timeAgo: "5h ago" },
+      ],
     },
     currentBid: 12.5,
     endTime: new Date(Date.now() + 3600 * 1000), // 1 hour
@@ -29,6 +40,12 @@ const auctionsMock = [
     nft: {
       name: "CryptoPunk #4321",
       image: "/img/cloneX.jpeg",
+      description: "CryptoPunk with futuristic shades and neon vibes.",
+      attributes: [
+        { trait_type: "Hair", value: "Mohawk" },
+        { trait_type: "Accessory", value: "VR Headset" },
+      ],
+      bids: [{ user: "0xXy...789", amount: 9.3, timeAgo: "1h ago" }],
     },
     currentBid: 9.3,
     endTime: new Date(Date.now() + 7200 * 1000), // 2 hours
@@ -39,6 +56,7 @@ const Auction = () => {
   const [auctions, setAuctions] = useState([]);
   const [bidInputs, setBidInputs] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedNFT, setSelectedNFT] = useState(null);
 
   const handleBid = (id) => {
     const enteredBid = parseFloat(bidInputs[id]);
@@ -68,15 +86,15 @@ const Auction = () => {
   };
 
   useEffect(() => {
-    // Simulate fetching data with a 1-second delay
     const timer = setTimeout(() => {
       setAuctions(auctionsMock);
       setIsLoading(false);
     }, 1000);
 
     const interval = setInterval(() => {
-      setAuctions((prevAuctions) => [...prevAuctions]); // Ensure state update triggers rerender
+      setAuctions((prev) => [...prev]);
     }, 1000);
+
     return () => {
       clearTimeout(timer);
       clearInterval(interval);
@@ -161,14 +179,16 @@ const Auction = () => {
               {auctions.map((auction) => (
                 <motion.div
                   key={auction.id}
-                  className="bg-gray-800 rounded-lg p-6 border border-purple-600/40 shadow-md hover:shadow-purple-700 transition"
+                  className="bg-gray-800 rounded-lg p-6 border border-purple-600/40 shadow-md hover:shadow-purple-700 transition cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  
                 >
                   <img
                     src={auction.nft.image}
                     alt={auction.nft.name}
                     className="w-full h-60 object-cover rounded mb-4"
+                    onClick={() => setSelectedNFT(auction.nft)}
                   />
                   <h2 className="text-xl font-semibold">{auction.nft.name}</h2>
                   <p className="text-gray-400 text-sm mt-1 mb-4">
@@ -197,7 +217,10 @@ const Auction = () => {
                       className="flex-1 px-4 py-2 rounded bg-gray-900 text-white border border-purple-500 focus:outline-none"
                     />
                     <button
-                      onClick={() => handleBid(auction.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBid(auction.id);
+                      }}
                       className="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded text-white font-semibold"
                     >
                       Bid
@@ -209,6 +232,12 @@ const Auction = () => {
           </>
         )}
       </main>
+
+      <NFTModal
+        nft={selectedNFT}
+        isOpen={!!selectedNFT}
+        onClose={() => setSelectedNFT(null)}
+      />
 
       <Footer />
     </div>
