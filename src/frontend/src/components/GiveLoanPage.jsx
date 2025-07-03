@@ -3,6 +3,7 @@ import Header from "./Header2";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 import { FaListUl, FaThLarge } from "react-icons/fa";
+import NFTDetailsModal from "./NFTDetailsModal";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -25,19 +26,31 @@ const GiveLoanPage = () => {
   const [chatOpen, setChatOpen] = useState(null);
   const [chatMessages, setChatMessages] = useState({});
   const [chatInput, setChatInput] = useState("");
+  const [selectedLoan, setSelectedLoan] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openNFTModal = (loan) => {
+    setSelectedLoan(loan);
+    setIsModalOpen(true);
+  };
+
+  const closeNFTModal = () => {
+    setIsModalOpen(false);
+    setSelectedLoan(null);
+  };
 
   const userProfiles = {
     "0xf5bb52": {
       name: "Alice.eth",
       reputation: "4.5/5",
       loan_history: "12 Loans • 95% Repaid",
-      profile_pic: "/images/avatars/avatar1.png",
+      profile_pic: "/img/Nfts/fem.jpg",
     },
     "0xced9f8": {
       name: "Bob.eth",
       reputation: "4.8/5",
       loan_history: "20 Loans • 100% Repaid",
-      profile_pic: "/images/avatars/avatar2.png",
+      profile_pic: "/img/Nfts/male2.jpg",
     },
   };
 
@@ -55,7 +68,7 @@ const GiveLoanPage = () => {
         asset: {
           name: "Impostors Genesis",
           display: "Impostors...",
-          image: "/images/nfts/impostors.png",
+          image: "/img/Nfts/imposter.webp",
         },
       },
       {
@@ -70,7 +83,7 @@ const GiveLoanPage = () => {
         asset: {
           name: "Nakamigos #8087",
           display: "Nakamigos #8087",
-          image: "/images/nfts/nakamigos.png",
+          image: "/img/Nfts/Nakamigos.png",
         },
       },
     ];
@@ -81,7 +94,7 @@ const GiveLoanPage = () => {
         id: "offer001",
         asset: {
           name: "Cool Cat #1234",
-          image: "/images/nfts/coolcat.png",
+          image: "/img/Nfts/3.png",
         },
         borrower: "0xabc123",
         amount: "5",
@@ -93,7 +106,7 @@ const GiveLoanPage = () => {
         id: "offer002",
         asset: {
           name: "Mutant Ape #9988",
-          image: "/images/nfts/mutantape.png",
+          image: "/img/Nfts/1.webp",
         },
         borrower: "0xdef456",
         amount: "8",
@@ -119,10 +132,7 @@ const GiveLoanPage = () => {
 
     setChatMessages((prev) => ({
       ...prev,
-      [offerId]: [
-        ...(prev[offerId] || []),
-        { sender: "You", text: chatInput },
-      ],
+      [offerId]: [...(prev[offerId] || []), { sender: "You", text: chatInput }],
     }));
     setChatInput("");
   };
@@ -278,7 +288,8 @@ const GiveLoanPage = () => {
                       .map((loan) => (
                         <motion.div
                           key={loan.id}
-                          className="bg-[#1e1e3f] p-6 rounded-2xl border border-purple-700/40 shadow-md hover:bg-[#2a2244] transition"
+                          onClick={() => openNFTModal(loan)}
+                          className="cursor-pointer bg-[#1e1e3f] p-6 rounded-2xl border border-purple-700/40 shadow-md hover:bg-[#2a2244] transition"
                           variants={sectionVariants}
                         >
                           <div className="flex items-center gap-3 mb-4">
@@ -585,7 +596,9 @@ const GiveLoanPage = () => {
                         <div className="h-40 overflow-y-auto space-y-2 mb-4">
                           {(chatMessages[offer.id] || []).map((msg, idx) => (
                             <div key={idx} className="text-sm text-white">
-                              <span className="font-semibold">{msg.sender}:</span>{" "}
+                              <span className="font-semibold">
+                                {msg.sender}:
+                              </span>{" "}
                               {msg.text}
                             </div>
                           ))}
@@ -613,6 +626,12 @@ const GiveLoanPage = () => {
                 ))}
               </motion.div>
             )}
+            <NFTDetailsModal
+              isOpen={isModalOpen}
+              onClose={closeNFTModal}
+              loan={selectedLoan}
+              borrowerProfile={userProfiles[selectedLoan?.borrower]}
+            />
           </main>
 
           <Footer />
