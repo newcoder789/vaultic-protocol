@@ -23,10 +23,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:8080",
+        target: "http://127.0.0.1:4943",        
         changeOrigin: true,
-      },headers: {
-        "Content-Security-Policy": "connect-src 'self' http://localhost:* http://127.0.0.1:8000 https://icp0.io https://*.icp0.io https://icp-api.io"
       }
     },
   },

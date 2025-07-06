@@ -39,7 +39,7 @@ actor class NFTLendingCanister(
         var logo = ?"https://vaultverse.example.com/logo.png";
         var name = ?"VaultVerse Lending";
         var symbol = ?"VVNFT";
-        var custodians = [Principal.fromText("lsoj4-xkphy-rbr5d-a5c3x-i2g7g-rxc5g-h77ih-vozzu-qsrrz-bwiui-2ae"),Principal.fromText("3tz33-zg5yy-jiy2n-lkytg-247fl-kbd6x-mfx5k-dukae-lqu7e-466ly-oae"),Principal.fromText("klrif-eqbpo-l5c72-tfjlz-z4uep-62wna-5mpay-c2y5x-3fnto-pggh2-zae")];
+        var custodians = [Principal.fromText("lsoj4-xkphy-rbr5d-a5c3x-i2g7g-rxc5g-h77ih-vozzu-qsrrz-bwiui-2ae"),Principal.fromText("3tz33-zg5yy-jiy2n-lkytg-247fl-kbd6x-mfx5k-dukae-lqu7e-466ly-oae"),Principal.fromText("klrif-eqbpo-l5c72-tfjlz-z4uep-62wna-5mpay-c2y5x-3fnto-pggh2-zae"), Principal.fromText("ehm6p-bceuv-4wnaw-gvdjq-2fkc6-gptzi-dgs3y-utlp3-v4c5f-uzfwz-nqe")];
         var created_at = _created_at;
         var upgraded_at = Time.now();
     };

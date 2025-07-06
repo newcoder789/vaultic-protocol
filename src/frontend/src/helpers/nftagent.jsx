@@ -28,7 +28,7 @@ export default async function get_data() {
     const canisterId = 'uzt4z-lp777-77774-qaabq-cai';  // dip canister id 
     const canisterId1 = '"bx6pk-jqaaa-aaaag-qbjpa-cai"';  // dip tested canister id 
     
-    const agent = new HttpAgent({ host: 'http://localhost:8080' });
+    const agent = new HttpAgent({ host: 'http://127.0.0.1:4943' });
     await agent.fetchRootKey();
     const dip721Actor = Actor.createActor(dip721IdlFactory, {
         agent,

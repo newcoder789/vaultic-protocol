@@ -26,11 +26,11 @@ const navVariants = {
 };
 const Header = () => {
   const { connect, disconnect, isConnecting, user } = useAuth()
-  const [agent, setAgent] = useState(null);
+  // const [agent, setAgent] = useState(null);
   const  [client, setClient] =useState(null);
   const [myIdentity, setMyIdentity] = useState(null);
   const [userPrincipal, setUserPrincipal] = useState(null);
-  // const agent = useAgent({ host: "http://localhost:8080" });
+  // const authenticatedAgent = useAgent();
   // const identity = useIdentity()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -47,7 +47,7 @@ const Header = () => {
     console.log("📦 useEffect triggered");
     let cancelled = false;
 
-    const fetchProfile = async (agent, myIdentity) => {
+    const fetchProfile = async (agent) => {
       try {
         if (!user?.principal) {
           console.warn("🚨 No user principal. Are you logged in?");
@@ -58,21 +58,37 @@ const Header = () => {
           console.warn("🚨 No authenticated agent yet.");
           return;
         }
+        try {
+          // if (isLocal) {
+          await agent.fetchRootKey();
+          // await authenticatedAgent.fetchRootKey();
+          console.log("✅ Root key fetched for both agents");
+          // }
+        } catch (err) {
+          console.warn("Unable to fetch root key");
+          console.error(err);
+        }
+        // Only create actors after root key is fetched (or immediately if not local)
 
+        const canisterID = "u6s2n-gx777-77774-qaaba-cai"
+        // const authenticatedActor = useMemo(() => {
+          // if (!authenticatedAgent || !user) return null;
+          // return Actor.createActor(idlFactory, {
+            // agent: authenticatedAgent,
+            // canisterId: canisterID,
+          // });
+        // }, [authenticatedAgent, user]);
+        const actor = Actor.createActor(idlFactory, {
+          agent,
+          canisterId: canisterID,
+        });
         // if (process.env.NODE_ENV === "development") {
           
-        // }
-        const canisterID = "u6s2n-gx777-77774-qaaba-cai"
-        const actor = Actor.createActor(idlFactory, {
-          agent: agent,
-          canisterId: canisterID
-          
-        });
 
         console.log("🎭 actor created");
         // console.log("✅ Root key fetched:", Buffer.from(agent.rootKey).toString("base64"));
         // const identity = await agent.getIdentity();
-        console.log("Delegation chain:", JSON.stringify(myIdentity.getDelegation().toJSON(), null, 2));
+        // console.log("Delegation chain:", JSON.stringify(myIdentity.getDelegation().toJSON(), null, 2));
         // const expiration = Number(agent.delegation.expiration) / 1_000_000; // Convert nanoseconds to milliseconds
         // console.log("Delegation expiration:", new Date(expiration).toISOString());
         // await actor.set_profile({
@@ -82,13 +98,17 @@ const Header = () => {
         //   joinedAt: Date.now()
         // });
 
-        console.log("✅ set_profile called");
+        console.log("✅ set_profile called",user.principal);
 
-        const fetchedProfile = await actor.get_profile(userPrincipal);
-        console.log("🎯 fetchedProfile:", fetchedProfile);
+        const fetchedProfile = await actor.get_profile(user?.principal);
+        if(fetchedProfile){
+          console.log("🎯 fetchedProfile:", fetchedProfile);
 
-        if (!cancelled && fetchedProfile !== null) {
-          setProfile(fetchedProfile);
+          if (!cancelled && fetchedProfile !== null) {
+            setProfile(fetchedProfile);
+          }
+        }else{
+          console.log("No Profile", fetchedProfile)
         }
       } catch (err) {
         console.error("❌ Error in fetchProfile:", err);
@@ -99,36 +119,43 @@ const Header = () => {
       return;
     }
 
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const host = isLocal ? "http://localhost:8080" : "https://icp0.io"; // <-- update to your backend server if needed
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1:4943";
+    const host = isLocal ? "http://127.0.0.1:4943" : "https://icp0.io"; // <-- update to your backend server if needed
 
-    AuthClient.create().then(async (client) => {
-      setClient(client);
-      const myIdentity = client.getIdentity();
-      setMyIdentity(myIdentity);
-      console.log("Agent identity:", myIdentity.getPrincipal().toText());
-      setUserPrincipal(myIdentity.getPrincipal());
-      const agent = new HttpAgent({
-        identity: myIdentity,
-        host,
-        fetchRootKey: isLocal, 
-      });
-      setAgent(agent);
+    // AuthClient.create().then(async (client) => {
+    //   setClient(client);
+    //   const myIdentity = client.getIdentity();
+    //   setMyIdentity(myIdentity);
+    //   console.log("Agent identity:", myIdentity.getPrincipal().toText());
+    //   setUserPrincipal(myIdentity.getPrincipal());
+    //   const agent = new HttpAgent({
+    //     identity: myIdentity,
+    //     host,
+    //     fetchRootKey: isLocal, 
+    //   });
+    //   setAgent(agent);
 
-      if (isLocal) {
-        try {
-          await agent.fetchRootKey();
-        } catch (err) {
-          console.warn("⚠️ Could not fetch root key from local replica");
-          console.error(err);
-          return; 
-        }
-      }
+    //   if (isLocal) {
+    //     try {
+    //       await agent.fetchRootKey();
+    //     } catch (err) {
+    //       console.warn("⚠️ Could not fetch root key from local replica");
+    //       console.error(err);
+    //       return; 
+    //     }
+    //   }
 
-      fetchProfile(agent, myIdentity);
-    }).catch((err) => {
-      console.error("AuthClient error:", err);
-    });
+    //   fetchProfile(agent, myIdentity);
+    // }).catch((err) => {
+    //   console.error("AuthClient error:", err);
+    // });
+    const agent = new HttpAgent({ host: 'http://127.0.0.1:4943' })
+    agent.fetchRootKey().then(()=>{
+      console.log("fetched root key in header");
+      fetchProfile(agent);
+    }).catch((err)=>console.log("error fethcing root key", err))
+    
+
     },[user]);
   
 
@@ -215,15 +242,23 @@ const Header = () => {
           <i className="bx bx-user-circle text-white text-3xl" />
           {/* Dropdown */}
             <AnimatePresence>
-              {isProfileOpen && (
+              {isProfileOpen && profile && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg p-4 text-black"
                 >
-                  <p className="font-semibold">Ayush Rawat</p>
-                  <p className="text-sm text-gray-600">ayushrawat4404@gmail.com</p>
+                  <div className="flex items-center gap-3 mb-2">
+                    {profile.profilePicUrl && (
+                      <img src={profile.profilePicUrl} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
+                    )}
+                    <div>
+                      <p className="font-semibold">{profile.username}</p>
+                      <p className="text-xs text-gray-600">{user.principal.toText()}</p>
+                    </div>
+                  </div>
+                  {profile.bio && <p className="text-sm text-gray-700 mb-2">{profile.bio}</p>}
                   <hr className="my-2" />
                   <ul className="space-y-2 text-sm">
                     <li>
@@ -268,6 +303,7 @@ const Header = () => {
                       </button>
                     </li>
                   </ul>
+                  <p className="text-xs text-gray-400 mt-2">Joined: {profile.joinedAt ? new Date(Number(profile.joinedAt)).toLocaleDateString() : ''}</p>
                 </motion.div>
               )}
             </AnimatePresence>

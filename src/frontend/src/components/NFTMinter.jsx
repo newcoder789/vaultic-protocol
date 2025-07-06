@@ -34,7 +34,7 @@ export default function NFTMinter({ userPrincipal }) {
             if (!isConnecting && user?.principal){
                 const userPrincipal = user.principal;
                 // Configure agent
-                const agent = new HttpAgent({ host: "http://localhost:8080" });
+                const agent = new HttpAgent({ host: "http://127.0.0.1:4943" });
                 await agent.fetchRootKey().catch((err) => {
                     console.warn("Unable to fetch root key:", err);
                 });

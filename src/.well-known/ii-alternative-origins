@@ -6,7 +6,11 @@
     "https://ulvla-h7777-77774-qaacq-cai.raw.ic0.app",
     "https://ulvla-h7777-77774-qaacq-cai.icp0.icp-api.io",
     "https://ulvla-h7777-77774-qaacq-cai.icp-api.io",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:3000",
     "http://localhost:3000",
-    "https://localhost:3000"
+    "http://127.0.0.1:4943",
+    "http://localhost:4943"
   ]
 }   

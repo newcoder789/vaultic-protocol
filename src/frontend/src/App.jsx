@@ -258,8 +258,7 @@ export default function App() {
 
       {/* <AuthenticatedSection /> */}
 
-      {/* Add NFT Metadata Section */}
-      {/* <section className="container mx-auto py-12">
+      <section className="container mx-auto py-12">
         <h2 className="text-3xl font-bold mb-6">Your NFTs</h2>
         {userPrincipal ? (
           <div style={{ minHeight: "200px", border: "1px solid #ccc" }}>
@@ -268,7 +267,7 @@ export default function App() {
         ) : (
           <p>Connect your wallet to view NFTs.</p>
         )}
-      </section> */}
+      </section>
       {/* <NFTMinter userPrincipal={userPrincipal} /> */}
     </Suspense>
   );

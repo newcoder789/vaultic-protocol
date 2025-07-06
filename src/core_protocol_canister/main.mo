@@ -361,10 +361,12 @@ actor VaultLending {
   type Icrc28TrustedOriginsResponse = { trusted_origins: [Text] };
   public shared({ caller }) func icrc28_trusted_origins(): async Icrc28TrustedOriginsResponse {
     let trustedOrigins: [Text] = [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
       "http://localhost:8080",
       "http://127.0.0.1:8080",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "http://localhost:4943",
+      "http://127.0.0.1:4943",
       "https://uzt4z-lp777-77774-qaabq-cai.icp0.io",
       "https://uzt4z-lp777-77774-qaabq-cai.raw.icp0.io",
       "https://uzt4z-lp777-77774-qaabq-cai.ic0.app",
@@ -867,7 +869,7 @@ actor VaultLending {
   public query func get_profile(who: Principal): async ?UserProfile {
     return users.get(who);
   };
-
+  
   public shared({ caller }) func setCustodians(newCustodians: [Principal]): async () {
     if (not isCustodian(caller)) {
       throw Error.reject("Unauthorized");

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { idlFactory } from '../../../declarations/core_protocol_canister/core_protocol_canister.did.js';
 import { idlFactory as dip721IdlFactory } from '../../../declarations/dip721_nft_container/dip721_nft_container.did.js';
-import { useAuth } from "@nfid/identitykit/react"
+import { useAuth, useIdentityKit } from "@nfid/identitykit/react"
 import './NFTMetadataFetcher.css';
 import { Principal } from '@dfinity/principal';
 import {motion} from 'framer-motion';
@@ -10,7 +10,8 @@ import { useAgent } from "@nfid/identitykit/react"
 
 const NFTMetadataFetcher = () => {
     const { connect, disconnect, isConnecting, user } = useAuth()   
-    const authenticatedAgent = useAgent()
+    // const authenticatedAgent = useAgent()
+    const { identity } = useIdentityKit();
     const [nfts, setNfts] = useState([]);
     const [actor, setActor] = useState(null);
     const [authenticatedActor, setAuthenticatedActor] = useState(null);
@@ -22,59 +23,65 @@ const NFTMetadataFetcher = () => {
     const [loans, setLoans] = useState([]);
     const [loanForm, setLoanForm] = useState({ tokenId: '', amount: '', interestRate: '', duration: '' });
     const [focusedTokenId, setFocusedTokenId] = useState(null);
-
-    const canisterPrincipal = 'u6s2n-gx777-77774-qaaba-cai'; 
-    const canisterId = 'uzt4z-lp777-77774-qaabq-cai';  // dip canister id 
+    const canisterId = process.env.CANISTER_ID_DIP721_NFT_CONTAINER;
+    const canisterPrincipal = process.env.CANISTER_ID_CORE_PROTOCOL_CANISTER;
+    // const isLocal = window.location.hostname.includes('localhost');
+    // const HOST = isLocal ? 'http://127.0.0.1:4943' : 'https://ic0.app';
+    // const canisterPrincipal = 'u6s2n-gx777-77774-qaaba-cai'; 
+    // const canisterId = 'uzt4z-lp777-77774-qaabq-cai';  // dip canister id 
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     useEffect(() => {
-        if (!isConnecting && user && authenticatedAgent && process.env.NODE_ENV === 'development') {
-            const agent = new HttpAgent({ host: 'http://localhost:8080' });
-            const fetchData = async () => {
+        const setupActors = async () => {
+            if (!isConnecting && user && identity) {
+                const authenticatedAgent = new HttpAgent({ identity, host: 'http://127.0.0.1:4943' });
+                const agent = new HttpAgent({ host: 'http://127.0.0.1:4943' });
                 try {
-                    const res = agent.fetchRootKey().catch((err) => {
-                        console.warn(
-                            "Unable to fetch root key. Check to ensure that your local replica is running"
-                        );
-                        console.error(err);
-                    });
-                    const res2 = authenticatedAgent.fetchRootKey();;
-                    console.log("result for root key", res);
-                    console.log(res2);                      
+                    // if (isLocal) {
+                        await agent.fetchRootKey();
+                        await authenticatedAgent.fetchRootKey();
+                        console.log("✅ Root key fetched for both agents");
+                    // }
                 } catch (err) {
+                    console.warn("Unable to fetch root key");
                     console.error(err);
                 }
-            };
+                // Only create actors after root key is fetched (or immediately if not local)
+                const authenticatedActor = Actor.createActor(idlFactory, {
+                        agent: authenticatedAgent,
+                        canisterId: canisterPrincipal,
+                        host: 'http://127.0.0.1:4943/',
+                    });
 
-              fetchData();
-            const actor = Actor.createActor(idlFactory, {
-                agent,
-                canisterId: canisterPrincipal,
-            });
-            
-            const authenticatedActor = Actor.createActor(idlFactory, {
-                agent: authenticatedAgent,
-                canisterId: canisterPrincipal,
-            });
-            setAuthenticatedActor(authenticatedActor)
-            setActor(actor);
-            console.log("Actor created:", actor);
-            console.log("Actor created:", authenticatedActor);
-            // Fetch owned token IDs from external canister
-            const dip721Actor = Actor.createActor(dip721IdlFactory, {
-                agent,
-                canisterId: canisterId,
-            });
-            const authenticatedDip721Actor = Actor.createActor(dip721IdlFactory, {
-                agent: authenticatedAgent,
-                canisterId: canisterId,
-            });
-            console.log("DIP721 Actor created:", authenticatedDip721Actor);
-            console.log("DIP721 Actor created:", dip721Actor);
-            setDip721Actor(dip721Actor);
-            setAuthenticatedDip721Actor(authenticatedDip721Actor);
-            console.log("User principal:", user.principal);
-
-        }
-    }, [user, user?.principal, isConnecting, authenticatedAgent]);
+                const authenticatedDip721Actor = Actor.createActor(dip721IdlFactory, {
+                        agent: authenticatedAgent,
+                        canisterId: canisterId,
+                        host: 'http://127.0.0.1:4943/',
+                    });
+                  
+                const actor = Actor.createActor(idlFactory, {
+                    agent,
+                    canisterId: canisterPrincipal,
+                    host: 'http://127.0.0.1:4943/',
+                });
+                const dip721Actor = Actor.createActor(dip721IdlFactory, {
+                    agent,
+                    canisterId: canisterId,
+                    host: 'http://127.0.0.1:4943/',
+                });
+                // const authenticatedDip721Actor = Actor.createActor(dip721IdlFactory, {
+                //     agent: authenticatedAgent,
+                //     canisterId: canisterId,
+                // });
+                setAuthenticatedActor(authenticatedActor);
+                setActor(actor);
+                setDip721Actor(dip721Actor);
+                setAuthenticatedDip721Actor(authenticatedDip721Actor);
+                console.log("Actors created after root key fetch");
+                console.log("User principal:", user.principal);
+            }
+        };
+        setupActors();
+    }, [user, user?.principal, isConnecting, identity]);
     useEffect(() => {
         if (user && actor && dip721Actor) {
             fetchNFTs();
@@ -143,7 +150,7 @@ const NFTMetadataFetcher = () => {
             if (!loanForm.tokenId || !loanForm.amount || !loanForm.interestRate || !loanForm.duration) {
                 setError('Please fill in all fields');
             }
-            console.log("canister id is working:", Principal.fromText(canisterId))
+            console.log("canister id is working:", Principal.fromText(canisterId))  
             const result = await authenticatedActor.createLoan(
                 Principal.fromText(canisterId),
                 BigInt(loanForm.tokenId),     
@@ -176,13 +183,7 @@ const NFTMetadataFetcher = () => {
         setLoading(true);
         setError(null);
         try {
-            const agent = new HttpAgent({ host: 'http://localhost:8080' });
-            await agent.fetchRootKey();
-            const actor = Actor.createActor(idlFactory, {
-                agent,
-                canisterId: canisterPrincipal,
-            });
-            const result = await actor.acceptLoan(loanId);
+            const result = await authenticatedActor.acceptLoan(loanId);
             if ('Ok' in result) {
                 alert('Loan accepted with transaction ID: ' + result.Ok);
                 await fetchNFTs();
