@@ -6,9 +6,12 @@ export default {
   ],
   theme: {
     extend: {
+      // fontFamily: {
+      //   // sans: ['Poppins', 'sans-serif'],
+      //    sans: ['Inter', 'sans-serif'],
       fontFamily: {
-        // sans: ['Poppins', 'sans-serif'],
-         sans: ['Inter', 'sans-serif'],
+       heading: ['Orbitron', 'sans-serif'],
+        body: ['Exo 2', 'sans-serif'],
       },
     },
   },
