@@ -102,7 +102,8 @@ const Auction = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 via-purple-950 to-black text-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-black opacity-40 z-0" />
       {/* 🌌 Particle Background */}
       <style>{`
         .particle {
@@ -122,22 +123,24 @@ const Auction = () => {
         }
       `}</style>
 
-      <div className="particles absolute inset-0 z-0">
-        {[...Array(30)].map((_, i) => (
-          <span
-            key={i}
-            className="particle bg-purple-400"
-            style={{
-              width: `${Math.random() * 2 + 1}px`,
-              height: `${Math.random() * 2 + 1}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${Math.random() * 15 + 10}s infinite ease-in-out`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          />
-        ))}
-      </div>
+
+        {/* Particle Effect */}
+        <div className="absolute inset-0 z-1 pointer-events-none">
+          {[...Array(35)].map((_, i) => (
+            <span
+              key={i}
+              className="particle bg-purple-400 opacity-20"
+              style={{
+                width: `${Math.random() * 2 + 1}px`,
+                height: `${Math.random() * 2 + 1}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animation: `float ${Math.random() * 15 + 10}s infinite ease-in-out`,
+                animationDelay: `${Math.random() * 5}s`,
+              }}
+            />
+          ))}
+        </div>
 
       <Header />
 
