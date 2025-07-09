@@ -4,6 +4,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 import NFTModal from "./NFTModal";
+import { createActor as createAuctionActor, canisterId as auctionCanisterId } from "../../declarations/core_protocol_canister";
+import { useAuth } from "@nfid/identitykit/react";
 
 // ✅ Animation variant
 const sectionVariants = {
@@ -15,63 +17,44 @@ const sectionVariants = {
   },
 };
 
-// 💎 Mock Auction Data
-const auctionsMock = [
-  {
-    id: "1",
-    nft: {
-      name: "Bored Ape #5678",
-      image: "/img/Nfts/2.webp",
-      description: "A rare Bored Ape from the original collection.",
-      attributes: [
-        { trait_type: "Fur", value: "Golden" },
-        { trait_type: "Eyes", value: "Laser" },
-      ],
-      bids: [
-        { user: "0xAb...123", amount: 12.5, timeAgo: "2h ago" },
-        { user: "0xCd...456", amount: 10.8, timeAgo: "5h ago" },
-      ],
-    },
-    currentBid: 12.5,
-    endTime: new Date(Date.now() + 3600 * 1000), // 1 hour
-  },
-  {
-    id: "2",
-    nft: {
-      name: "CryptoPunk #4321",
-      image: "/img/cloneX.jpeg",
-      description: "CryptoPunk with futuristic shades and neon vibes.",
-      attributes: [
-        { trait_type: "Hair", value: "Mohawk" },
-        { trait_type: "Accessory", value: "VR Headset" },
-      ],
-      bids: [{ user: "0xXy...789", amount: 9.3, timeAgo: "1h ago" }],
-    },
-    currentBid: 9.3,
-    endTime: new Date(Date.now() + 7200 * 1000), // 2 hours
-  },
-];
-
 const Auction = () => {
+  const { user } = useAuth();
   const [auctions, setAuctions] = useState([]);
   const [bidInputs, setBidInputs] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNFT, setSelectedNFT] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handleBid = (id) => {
+  useEffect(() => {
+    const fetchAuctions = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const actor = createAuctionActor(auctionCanisterId);
+        // Replace with real canister call
+        const liveAuctions = await actor.get_live_auctions();
+        setAuctions(liveAuctions);
+      } catch (err) {
+        setError("Failed to load auctions.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAuctions();
+  }, []);
+
+  const handleBid = async (id) => {
     const enteredBid = parseFloat(bidInputs[id]);
     if (isNaN(enteredBid)) return alert("Enter a valid bid amount");
-
-    const updated = auctions.map((auction) => {
-      if (auction.id === id && enteredBid > auction.currentBid) {
-        return { ...auction, currentBid: enteredBid };
-      }
-      return auction;
-    });
-
-    setAuctions(updated);
+    try {
+      const actor = createAuctionActor(auctionCanisterId);
+      await actor.place_bid(id, enteredBid, user?.principal);
+      alert("Bid placed!");
+      // Optionally refetch auctions
+    } catch (err) {
+      alert("Failed to place bid.");
+    }
     setBidInputs((prev) => ({ ...prev, [id]: "" }));
-    alert("Bid placed!");
   };
 
   const getTimeRemaining = (endTime) => {
@@ -84,22 +67,6 @@ const Auction = () => {
 
     return `${hours}h ${minutes}m ${seconds}s`;
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAuctions(auctionsMock);
-      setIsLoading(false);
-    }, 1000);
-
-    const interval = setInterval(() => {
-      setAuctions((prev) => [...prev]);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 via-purple-950 to-black text-white relative overflow-hidden">
@@ -146,24 +113,11 @@ const Auction = () => {
 
       <main className="max-w-7xl mx-auto px-6 lg:px-20 py-20 relative z-10 min-h-[90vh]">
         {isLoading ? (
-          <div
-            className="flex justify-center items-center"
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: "20",
-            }}
-          >
-            <div
-              className="w-16 h-16 border-4 border-t-4 border-purple-500 border-solid rounded-full"
-              style={{
-                borderTopColor: "#9333ea",
-                animation: "spin 1s linear infinite",
-              }}
-            />
+          <div className="flex justify-center items-center" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: "20" }}>
+            <div className="w-16 h-16 border-4 border-t-4 border-purple-500 border-solid rounded-full" style={{ borderTopColor: "#9333ea", animation: "spin 1s linear infinite" }} />
           </div>
+        ) : error ? (
+          <div className="text-center text-red-400 py-20">{error}</div>
         ) : (
           <>
             <motion.h1

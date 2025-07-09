@@ -1,7 +1,7 @@
 // src/components/Governance.jsx
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import Header from "./Header2";
+import Header from "./header"
 import Footer from "./Footer";
 
 const sectionVariants = {

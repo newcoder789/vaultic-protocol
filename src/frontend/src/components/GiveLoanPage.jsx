@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Header from "./Header2";
+import Header from "./header";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 import { FaListUl, FaThLarge } from "react-icons/fa";

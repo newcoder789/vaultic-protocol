@@ -2,7 +2,7 @@ import React from 'react';
 
 const GovernanceTokenomics = () => {
   return (
-    <div className="w-full py-16 px-6 bg-gradient-to-r from-black via-[#1a0a2a] to-black">
+    <div className="w-full py-16 px-6 bg-gradient-to-r from-black via-[#1a0a2a] to-black">``
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
           Governance & Tokenomics

@@ -35,6 +35,13 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editProfile, setEditProfile] = useState({
+    username: "",
+    profilePicUrl: "",
+    bio: "",
+  });
+  const [editError, setEditError] = useState(null);
   const headerRef = useRef(null);
   const isInView = useInView(headerRef, { once: true, amount: 0.5 });
   const navigate = useNavigate();
@@ -156,9 +163,44 @@ const Header = () => {
     }).catch((err)=>console.log("error fethcing root key", err))
     
 
-    },[user]);
+    }, [user]);
   
+  const handleProfileEdit = async (e) => {
+    e.preventDefault();
+    setEditError(null);
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1:4943";
+    const host = isLocal ? "http://127.0.0.1:4943" : "https://icp0.io"; // <-- update to your backend server if needed
+    const agent = new HttpAgent({ host, fetchRootKey: isLocal });
+    // const agent = authenticatedAgent; // Use the authenticated agent directly
+    try {
+      await agent.fetchRootKey();
+    } catch (err) {
+      console.warn("⚠️ Could not fetch root key");
+      console.error(err);
+      setEditError("Failed to fetch root key. Please try again.");
+      return;
+    }
 
+    const actor = Actor.createActor(idlFactory, {
+      agent,
+      canisterId: "u6s2n-gx777-77774-qaaba-cai",
+    });
+
+    try {
+      await actor.set_profile({
+        username: editProfile.username,
+        bio: editProfile.bio,
+        profilePicUrl: editProfile.profilePicUrl,
+        joinedAt: profile.joinedAt, // Keep the original joinedAt value
+      });
+      setProfile({ ...profile, ...editProfile }); // Update local profile state
+      setIsEditingProfile(false);
+      setEditProfile({ username: "", profilePicUrl: "", bio: "" }); // Reset form
+    } catch (err) {
+      console.error("❌ Error updating profile:", err);
+      setEditError("Failed to update profile. Please try again.");
+    }
+  };
   return (
     <motion.header
       ref={headerRef}
@@ -263,10 +305,10 @@ const Header = () => {
                   <ul className="space-y-2 text-sm">
                     <li>
                       <button
-                        onClick={() => alert("Go to Profile")}
+                        onClick={() => setIsEditingProfile(true)}
                         className="hover:underline text-black w-full text-left"
                       >
-                        View Profile
+                        Edit Profile
                       </button>
                     </li>
                     <li>
@@ -307,6 +349,40 @@ const Header = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+          {/* Edit Profile Modal */}
+          {isEditingProfile && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+                <h2 className="text-lg font-semibold mb-2">Edit Profile</h2>
+                <form onSubmit={handleProfileEdit}>
+                  <input
+                    className="w-full border p-2 rounded mb-2"
+                    placeholder="Username"
+                    value={editProfile.username}
+                    onChange={e => setEditProfile({ ...editProfile, username: e.target.value })}
+                    required
+                  />
+                  <input
+                    className="w-full border p-2 rounded mb-2"
+                    placeholder="Profile Pic URL"
+                    value={editProfile.profilePicUrl}
+                    onChange={e => setEditProfile({ ...editProfile, profilePicUrl: e.target.value })}
+                  />
+                  <textarea
+                    className="w-full border p-2 rounded mb-2"
+                    placeholder="Bio"
+                    value={editProfile.bio}
+                    onChange={e => setEditProfile({ ...editProfile, bio: e.target.value })}
+                  />
+                  <div className="flex gap-2 mt-2">
+                    <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded">Save</button>
+                    <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+                  </div>
+                  {editError && <p className="text-red-500 text-xs mt-2">{editError}</p>}
+                </form>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Hamburger (Mobile) */}

@@ -10,24 +10,34 @@ import { IdentityKitProvider, IdentityKitTheme } from "@nfid/identitykit/react"
 
 import { IdentityKitAuthType } from "@nfid/identitykit";
 import { NFIDW, InternetIdentity, Stoic, OISY, MockedSigner } from "@nfid/identitykit"
-// internet_identity: http://127.0.0.1:4943/?canisterId=ucwa4-rx777-77774-qaada-cai&id=ulvla-h7777-77774-qaacq-cai
-// InternetIdentity.providerUrl = "http://localhost:4943/?canisterId=ucwa4-rx777-77774-qaada-cai&id=ulvla-h7777-77774-qaacq-cai"; 
+InternetIdentity.providerUrl = "http://localhost:4943/?canisterId=uxrrr-q7777-77774-qaaaq-cai&id=ulvla-h7777-77774-qaacq-cai"; 
 // InternetIdentity.providerUrl = "https://identity.internetcomputer.org/"
+
+// Helper to get canister IDs from env or fallback to dev
+const CANISTER_IDS = [
+  process.env.CANISTER_ID_CORE_PROTOCOL_CANISTER || "u6s2n-gx777-77774-qaaba-cai",
+  process.env.CANISTER_ID_DIP721_NFT_CONTAINER || "uxrrr-q7777-77774-qaaaq-cai",
+  process.env.CANISTER_ID_OTHER || "uzt4z-lp777-77774-qaabq-cai"
+];
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <IdentityKitProvider
       authType={IdentityKitAuthType.STANDARD}
       signerClientOptions={{
-        targets: ["u6s2n-gx777-77774-qaaba-cai", "uxrrr-q7777-77774-qaaaq-cai", "uzt4z-lp777-77774-qaabq-cai"],
-        derivationOrigin: "http://localhost:3000",
-        // derivationOrigin: "https://ulvla-h7777-77774-qaacq-cai.icp0.io",  
+        targets: CANISTER_IDS,
+        derivationOrigin: window.location.hostname.includes("localhost")
+          ? "http://localhost:3000"
+          : window.location.origin,
       }}
-      signers={[
-        InternetIdentity,
-        NFIDW, Stoic, OISY]}
-      featuredSigner={InternetIdentity} 
+      signers={[InternetIdentity, NFIDW, Stoic, OISY]}
+      featuredSigner={InternetIdentity}
       theme={IdentityKitTheme.DARK}
-      agentOptions={{ host: "http://127.0.0.1:4943/" }}
+      agentOptions={{
+        host: window.location.hostname.includes("localhost")
+          ? "http://127.0.0.1:4943/"
+          : "https://icp0.io"
+      }}
     >
       <App />
     </IdentityKitProvider>

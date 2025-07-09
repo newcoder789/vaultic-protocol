@@ -5,6 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 const NFTModal = ({ nft, isOpen, onClose }) => {
   if (!nft) return null;
 
+  // If nft is a canister object, map fields accordingly
+  const attributes = nft.attributes || nft.metadata || [];
+  const bids = nft.bids || nft.bidHistory || [];
+
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1 },
@@ -25,7 +29,7 @@ const NFTModal = ({ nft, isOpen, onClose }) => {
             <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">
               ✖
             </button>
-            <img src={nft.image} alt={nft.name} className="w-full h-64 object-cover rounded mb-4" />
+            <img src={nft.image || nft.imageUrl} alt={nft.name} className="w-full h-64 object-cover rounded mb-4" />
             <h2 className="text-2xl font-semibold mb-2">{nft.name}</h2>
             <p className="text-gray-400 mb-4">
               {nft.description || "This NFT has no description."}
@@ -34,9 +38,9 @@ const NFTModal = ({ nft, isOpen, onClose }) => {
             <div className="mb-4">
               <h3 className="font-bold text-purple-400 mb-1">Attributes</h3>
               <ul className="text-sm text-gray-300 grid grid-cols-2 gap-x-6">
-                {(nft.attributes || []).map((attr, i) => (
+                {attributes.map((attr, i) => (
                   <li key={i}>
-                    <strong>{attr.trait_type}</strong>: {attr.value}
+                    <strong>{attr.trait_type || attr.key}</strong>: {attr.value}
                   </li>
                 ))}
               </ul>
@@ -44,11 +48,11 @@ const NFTModal = ({ nft, isOpen, onClose }) => {
 
             <div>
               <h3 className="font-bold text-purple-400 mb-2">Bid History</h3>
-              {(nft.bids || []).length > 0 ? (
+              {bids.length > 0 ? (
                 <ul className="text-sm space-y-1 text-gray-300">
-                  {nft.bids.map((bid, i) => (
+                  {bids.map((bid, i) => (
                     <li key={i}>
-                      <span className="text-purple-300 font-medium">{bid.user}</span> bid {bid.amount} ICP • {bid.timeAgo}
+                      <span className="text-purple-300 font-medium">{bid.user || bid.bidder}</span> bid {bid.amount} ICP • {bid.timeAgo || bid.timestamp}
                     </li>
                   ))}
                 </ul>

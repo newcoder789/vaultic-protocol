@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
+import { createActor as createNFTActor, canisterId as nftCanisterId } from "../../../../src/declarations/dip721_nft_container/index.js";
+import { useAuth } from "@nfid/identitykit/react";
 
 // Animation Variants
 const containerVariants = {
@@ -52,25 +54,45 @@ const inputVariants = {
 };
 
 const LoanPage = () => {
+  const { user } = useAuth();
   const [loanAmount, setLoanAmount] = useState("");
   const [duration, setDuration] = useState("");
   const [interestRate] = useState("5");
   const [userNFTs, setUserNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState("");
   const [activeTab, setActiveTab] = useState("new-loan");
+  const [myLoans, setMyLoans] = useState([]);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const mockNFTs = [
-      { id: "1", name: "CryptoPunk #1234" },
-      { id: "2", name: "Bored Ape #5678" },
-      { id: "3", name: "Cool Cat #9012" },
-    ];
-    setUserNFTs(mockNFTs);
-    if (mockNFTs.length > 0) setSelectedNFT(mockNFTs[0].id);
-  }, []);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const nftActor = createNFTActor(nftCanisterId);
+        const nfts = await nftActor.get_user_nfts(user?.principal);
+        setUserNFTs(nfts);
+        if (nfts.length > 0) setSelectedNFT(nfts[0].id);
+        // Fetch loans and offers from core_protocol_canister
+        // Replace with real canister calls
+        // const coreActor = createCoreActor(coreCanisterId);
+        // setMyLoans(await coreActor.get_my_loans(user?.principal));
+        // setOffers(await coreActor.get_my_offers(user?.principal));
+      } catch (err) {
+        setError("Failed to load NFT/loan data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user?.principal) fetchData();
+  }, [user]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    // Call canister to request loan
+    // await coreActor.request_loan(...)
     alert(`Loan Submitted!\nAmount: ${loanAmount} ICP\nDuration: ${duration} months\nInterest: ${interestRate}%\nNFT: ${selectedNFT}`);
   };
 
@@ -298,6 +320,56 @@ const LoanPage = () => {
                 No loan offers received yet.
               </div>
             </motion.div>
+          )}
+
+          {loading ? (
+  <div className="text-center text-white py-20">Loading loan data...</div>
+) : error ? (
+  <div className="text-center text-red-400 py-20">{error}</div>
+) : (
+            <>
+              {/* Active Loans Section - Only visible if there are active loans */}
+              {myLoans.length > 0 && (
+                <motion.div className="w-full max-w-3xl mt-10 space-y-10" variants={sectionVariants}>
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-3">Active Loans</h2>
+                    <div className="bg-gray-900 p-5 rounded-lg shadow-md text-gray-300 space-y-4">
+                      {myLoans.map((loan) => (
+                        <div key={loan.id} className="flex justify-between items-center border-b border-gray-700 pb-3">
+                          <div>
+                            <div className="text-white font-medium">{`Loan #${loan.id.split("-")[1]}`}</div>
+                            <div className="text-sm text-gray-400">{`${loan.nft_name} • ${loan.amount} ICP • ${loan.duration} months`}</div>
+                          </div>
+                          <div className={`text-sm ${loan.status === "Repaid" ? "text-green-400" : "text-red-400"}`}>
+                            {loan.status}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Offers Section - Only visible if there are offers */}
+              {offers.length > 0 && (
+                <motion.div className="w-full max-w-3xl mt-10 space-y-6" variants={sectionVariants}>
+                  <h2 className="text-2xl font-semibold">Offers Received</h2>
+                  <div className="bg-gray-900 p-5 rounded-lg shadow-md text-gray-300 space-y-4">
+                    {offers.map((offer) => (
+                      <div key={offer.id} className="flex justify-between items-center border-b border-gray-700 pb-3">
+                        <div>
+                          <div className="text-white font-medium">{`Offer #${offer.id.split("-")[1]}`}</div>
+                          <div className="text-sm text-gray-400">{`${offer.nft_name} • ${offer.amount} ICP • ${offer.duration} months`}</div>
+                        </div>
+                        <div className="text-sm text-yellow-400">
+                          Pending
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </>
           )}
         </motion.main>
 
